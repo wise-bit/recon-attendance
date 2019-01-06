@@ -1,0 +1,25 @@
+// Choose location of storing an image
+
+JFileChooser chooser = new JFileChooser();
+chooser.setDialogTitle("Save Image");
+chooser.setFileFilter(new FileNameExtensionFilter("Images only", "png", "jpeg", "jpg")); //this file extentions are shown
+int showSaveDialog = chooser.showSaveDialog(this);
+if (showSaveDialog == 0) {                  //if pressed 'Save' button
+    String filePath = chooser.getCurrentDirectory().toString().replace("\\", "/");
+    String fileName = chooser.getSelectedFile().getName(); //get user entered file name to save
+    ImageIO.write(image, "PNG", new File(filePath + "/" + fileName + ".png"));
+
+}
+
+
+// Old way of getting images
+
+int showConfirmDialog = JOptionPane.showConfirmDialog(this, imageLbl, "Image Viewer", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, new ImageIcon(""));
+
+if (showConfirmDialog == JOptionPane.YES_OPTION) {
+
+    // save image to PNG file
+    String filePath = "res/trainingSet/teacher1/student1";
+    ImageIO.write(image, "PNG", new File(filePath + "/" + "test.png"));
+
+}
