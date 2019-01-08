@@ -35,6 +35,7 @@ public class Main {
 //        scan = new Scan();
 
 //        newface = new NewFace();
+        training = new TrainFace();
 
     }
 
@@ -60,6 +61,17 @@ public class Main {
             allClasses.add(new Classroom(filename, countFolders("res/attendanceData/teacher1/" + filename)));
         }
 
+    }
+
+    public static String[] listFilesFolders(String path) {
+        File file = new File(path);
+        String[] directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File current, String name) {
+                return new File(current, name).isDirectory();
+            }
+        });
+        return directories;
     }
 
     // Counts lines in a txt/csv file

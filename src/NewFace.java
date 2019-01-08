@@ -23,7 +23,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
     public static final int imageWidth = 300;
     public static final int imageHeight = 240;
 
-    JLabel title = new JLabel("New Profile");
+    JLabel title;
 
     JLabel askName = new JLabel("Name: ");
     JLabel askEmail = new JLabel("Email");
@@ -127,8 +127,6 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 0));
-
-        // TODO: Add buttons
 
         register.addActionListener(this);
         save.addActionListener(this);
