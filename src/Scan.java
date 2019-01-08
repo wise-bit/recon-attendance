@@ -112,15 +112,15 @@ public class Scan extends JFrame implements WebcamClass, ActionListener {
 
             // FUNCTION: FLIP
 
-            for (int i=0;i<image.getWidth()/2;i++)
-                for (int j=0;j<image.getHeight();j++)
-                {
+            for (int i=0;i<image.getWidth()/2;i++) {
+                for (int j = 0; j < image.getHeight(); j++) {
                     int tmp = image.getRGB(i, j);
 
-                    image.setRGB(i, j, image.getRGB(image.getWidth()-i-1, j));
-                    image.setRGB(image.getWidth()-i-1, j, tmp);
+                    image.setRGB(i, j, image.getRGB(image.getWidth() - i - 1, j));
+                    image.setRGB(image.getWidth() - i - 1, j, tmp);
 
                 }
+            }
 
             Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(dimg);

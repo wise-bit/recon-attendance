@@ -34,7 +34,7 @@ public class Main {
 //        studentlist = new StudentList();
 //        scan = new Scan();
 
-        newface = new NewFace();
+//        newface = new NewFace();
 
     }
 
