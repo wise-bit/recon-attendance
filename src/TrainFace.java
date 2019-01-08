@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class TrainFace extends JFrame implements AdditionServices, ActionListener {
+public class TrainFace extends JFrame implements AdditionServices, ActionListener, WebcamClass {
 
     JLabel title = new JLabel("Add more phases of faces");
 
@@ -29,6 +29,18 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+    }
+
+
+
+    @Override
+    public int getTimerTime() {
+        return 0;
+    }
+
+    @Override
+    public void setTimerTime(int timerTime) {
 
     }
 }

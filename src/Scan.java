@@ -3,14 +3,11 @@ import com.github.sarxos.webcam.Webcam;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +27,7 @@ public class Scan extends JFrame implements WebcamClass, ActionListener {
 
     Webcam webcam;
     BufferedImage image;
-    JLabel imageLbl = new JLabel();;
+    JLabel imageLbl = new JLabel();
 
     private Timer timer=new Timer(10, this);
 
@@ -59,7 +56,6 @@ public class Scan extends JFrame implements WebcamClass, ActionListener {
             imageLbl.setVerticalAlignment(JLabel.CENTER);
 
             add(imageLbl, BorderLayout.CENTER);
-
 
         } else {
             JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam...",
