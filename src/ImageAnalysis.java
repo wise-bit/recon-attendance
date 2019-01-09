@@ -15,9 +15,12 @@ public class ImageAnalysis {
 
         String filePath = "res/pureTestSets/";
 
+        int width = img.getWidth();
+        int height = img.getHeight();
 
+        System.out.println(width + " " + height);
 
-        ImageIO.write(toGreyScale(img), "PNG", new File(filePath + "modifiedImage1.png"));
+        ImageIO.write(toGreyScalePixelInefficient(img), "PNG", new File(filePath + "modifiedImage1.png"));
 
     }
 
@@ -29,6 +32,9 @@ public class ImageAnalysis {
     }
 
     public static BufferedImage toGreyScalePixelInefficient(BufferedImage image) {
+
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
         for (int x = 0; x < image.getWidth(); ++x) {
             for (int y = 0; y < image.getHeight(); ++y) {
                 int rgb = image.getRGB(x, y);
@@ -38,10 +44,11 @@ public class ImageAnalysis {
 
                 int grayLevel = (r + g + b) / 3;
                 int gray = (grayLevel << 16) + (grayLevel << 8) + grayLevel;
-                image.setRGB(x, y, gray);
+                // System.out.println(rgb + " : " + r + " " + g + " " + b + " " + gray);
+                newImage.setRGB(x, y, gray);
             }
         }
-        return image;
+        return newImage;
     }
 
     public static BufferedImage flipImageX(BufferedImage image) {
