@@ -1,4 +1,5 @@
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
@@ -20,7 +21,7 @@ public class ImageAnalysis {
 
         System.out.println(width + " " + height);
 
-        ImageIO.write(toGreyScalePixelInefficient(img), "PNG", new File(filePath + "modifiedImage1.png"));
+        ImageIO.write( resize( toGreyScalePixelInefficient(img) , 5, 10), "PNG", new File(filePath + "modifiedImage1.png"));
 
     }
 
@@ -33,7 +34,8 @@ public class ImageAnalysis {
 
     public static BufferedImage toGreyScalePixelInefficient(BufferedImage image) {
 
-        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        // BufferedImage newImage = image;
 
         for (int x = 0; x < image.getWidth(); ++x) {
             for (int y = 0; y < image.getHeight(); ++y) {
@@ -48,7 +50,17 @@ public class ImageAnalysis {
                 newImage.setRGB(x, y, gray);
             }
         }
+        System.out.println(newImage.getWidth() + " " + newImage.getHeight());
         return newImage;
+    }
+
+    public static BufferedImage resize (BufferedImage img, int height, int width) {
+        Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = resized.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        return resized;
     }
 
     public static BufferedImage flipImageX(BufferedImage image) {
