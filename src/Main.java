@@ -1,7 +1,4 @@
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,12 +26,7 @@ public class Main {
         init();
 
         // login = new Login();
-        // tabledata = new TableData();
 
-//        studentlist = new StudentList();
-//        scan = new Scan();
-
-//        newface = new NewFace();
         training = new TrainFace();
 
     }

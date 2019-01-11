@@ -195,7 +195,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         }
 
         if (e.getSource() == save) {
-            Main.newface.dispose();
+            Main.training.dispose();
             System.exit(0); // TODO: REMOVE LATER
         }
 
