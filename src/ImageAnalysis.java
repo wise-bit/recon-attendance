@@ -16,12 +16,9 @@ public class ImageAnalysis {
 
     public static void main(String[] args) throws IOException {
 
-        BufferedImage img = img = ImageIO.read(new File("res/pureTestSets/face1.png"));
+        BufferedImage img = ImageIO.read(new File("res/pureTestSets/face1.png"));
 
         String filePath = "res/pureTestSets/";
-
-        int width = img.getWidth();
-        int height = img.getHeight();
 
         ImageIO.write( trainingReady(img) , "PNG", new File(filePath + "modifiedImage1.png"));
 
@@ -145,7 +142,7 @@ public class ImageAnalysis {
                 for (int x = 0; x < 3 ; x++) {
                     for (int y = 0; y < 3; y++) {
                         try {
-                            newImage.setRGB(i * 3 + x, j * 3 + y, WHITE);
+                            newImage.setRGB(i * 3 + x, j * 3 + y, BLACK);
                         } catch (Exception e) {
                             System.out.println(i * 3 + j + " " + j * 3 + y);
                         }
@@ -153,7 +150,7 @@ public class ImageAnalysis {
                 }
 
                 if (posOfPix != 4) {
-                    newImage.setRGB(i * 3 + posOfPix % 3, j * 3 + posOfPix / 3, BLACK);
+                    newImage.setRGB(i * 3 + posOfPix % 3, j * 3 + posOfPix / 3, WHITE);
                 }
 
             }
@@ -171,27 +168,82 @@ public class ImageAnalysis {
 
     public static BufferedImage visualLandmarkAssignment (BufferedImage image) {
 
-        int segmentCount = 10; // To be changed for more --> less precision for landmark points (multiple of 20)
+        // BufferedImage imageCopy = image;
+        BufferedImage imageCopy = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);;
+
+        int segmentCount = 100; // To be changed for more --> less precision for landmark points (multiple of 20)
+        int distingushingThreshold = 0;
 
         int segmentLength = image.getHeight() / segmentCount;
+        System.out.println(segmentLength);
 
-        for (int x = 0; x < segmentCount; x++) {
-            for (int y = 0; y < segmentCount; y++) {
+        for (int y = 0; y < segmentCount; y++) {
+            for (int x = 0; x < segmentCount; x++) {
 
+                int RGBSum = 0;
+
+                for (int i = 0; i < segmentLength; i++) {
+                    for (int j = 0; j < segmentLength; j++) {
+                        RGBSum += comprehensiveRGB(image.getRGB(x*segmentLength + j, y*segmentLength + i));
+                    }
+                }
+
+                 if (RGBSum > distingushingThreshold) {
+                     // image.setRGB(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, RGBGenerator(255, 0, 0));
+                     Graphics2D g = (Graphics2D) imageCopy.getGraphics();
+                     g.setColor(Color.RED);
+                     g.setStroke(new BasicStroke(5));
+                     int dotsize = 5; // CHANGEABLE
+                     g.fillOval(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, dotsize, dotsize);
+                     // TODO: Store these points somewhere
+                     // System.out.println(segmentLength*x + segmentLength/2 + ":" + (segmentLength*y + segmentLength/2) + " --> " + RGBSum);
+                 }
 
 
             }
         }
 
+        return imageCopy;
+
+    }
+
+    public static BufferedImage addLandmark (BufferedImage image, int x, int y) {
         return image;
+    }
+
+    public static void printReverseRGB (int RGB) {
+        int red = (RGB >> 16) & 0xFF;
+        int green = (RGB >> 8) & 0xFF;
+        int blue = (RGB & 0xFF);
+        System.out.printf("%d --> %d,%d,%d\n", RGB, red, green, blue);
+    }
+
+    public static int comprehensiveRGB(int RGB) {
+        int red = (RGB >> 16) & 0xFF;
+        int green = (RGB >> 8) & 0xFF;
+        int blue = (RGB & 0xFF);
+        return red + green + blue;
+    }
+
+
+    //////// DETECTING FEATURES OF FACE ////////
+
+    public static boolean detectHead () {
 
     }
 
     // Prepares image to be stored for training for the facial recognition
     public static BufferedImage trainingReady(BufferedImage image) {
 
-        BufferedImage croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+        BufferedImage croppedImage;
 
+        // Crops image based on orientation
+        if (image.getHeight() <= image.getWidth())
+            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+        else
+            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
+
+        // Greyscales image for analysis purposes
         BufferedImage greyScaledImage = toGreyScalePixelInefficient(croppedImage);
 
         // uses the ratio of 450
@@ -200,12 +252,12 @@ public class ImageAnalysis {
 
         // BufferedImage boldedImage = bold(resizedImage);
 
+        // Creates a glitched image to enhance features of face
         BufferedImage glitchedImage = createGlitch(resizedImage);
 
-        // BufferedImage resizedAgain = resize( glitchedImage , 800, 1040);
-        // BufferedImage resizedAgain = resize( glitchedImage , 200, 258);
+        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
 
-        return glitchedImage;
+        return landmarkedImage;
 
     }
 
