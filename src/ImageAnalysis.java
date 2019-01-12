@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ImageAnalysis {
@@ -13,14 +14,40 @@ public class ImageAnalysis {
 
     public static final int BLACK = RGBGenerator(0,0,0);
     public static final int WHITE = RGBGenerator(255,255,255);
+    public static final int sensitivity = -2000000;
+    public static final int landmarkSize = 5;
+    public static final int segmentation = 200;
 
     public static void main(String[] args) throws IOException {
-
         BufferedImage img = ImageIO.read(new File("res/pureTestSets/face1.png"));
-
         String filePath = "res/pureTestSets/";
-
         ImageIO.write( trainingReady(img) , "PNG", new File(filePath + "modifiedImage1.png"));
+    }
+
+    // Prepares image to be stored for training for the facial recognition
+    public static BufferedImage trainingReady(BufferedImage image) {
+
+//        BufferedImage croppedImage;
+//        // Crops image based on orientation
+//        if (image.getHeight() <= image.getWidth())
+//            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+//        else
+//            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
+
+        // Greyscales image for analysis purposes
+        BufferedImage greyScaledImage = toGreyScalePixelInefficient(image);
+
+        // uses the ratio of 450
+        // BufferedImage resizedImage = resize( greyScaledImage , 100, 129);
+        BufferedImage resizedImage = resize( greyScaledImage , 200, 200);
+
+        // BufferedImage boldedImage = bold(resizedImage);
+        // Creates a glitched image to enhance features of face
+        BufferedImage glitchedImage = createGlitch(resizedImage);
+        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
+
+        // TODO: Change this line
+        return greyScaledImage;
 
     }
 
@@ -124,7 +151,7 @@ public class ImageAnalysis {
             for (int j = 1; j < image.getHeight()-1; j++) {
 
                 // These are the default values in case the differences are the same
-                int maxDiff = -1500000;
+                int maxDiff = sensitivity;
                 int posOfPix = 4;
 
                 if (image.getRGB(i-1, j-1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i-1, j-1) - image.getRGB(i, j); posOfPix = 0; }
@@ -166,16 +193,28 @@ public class ImageAnalysis {
         return subImgage;
     }
 
+    public static BufferedImage mask (BufferedImage image, int x, int y, int length, int width) // boolean?
+    {
+        BufferedImage imageCopy = new BufferedImage(length, width, BufferedImage.TYPE_INT_RGB);
+
+        // TODO: finish masking algorithm
+
+        return imageCopy;
+
+    }
+
     public static BufferedImage visualLandmarkAssignment (BufferedImage image) {
 
         // BufferedImage imageCopy = image;
-        BufferedImage imageCopy = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);;
+        BufferedImage imageCopy = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-        int segmentCount = 100; // To be changed for more --> less precision for landmark points (multiple of 20)
+        int segmentCount = segmentation; // To be changed for more --> less precision for landmark points (multiple of 20)
         int distingushingThreshold = 0;
 
         int segmentLength = image.getHeight() / segmentCount;
         System.out.println(segmentLength);
+
+        ArrayList<Point> pointsPlaced = new ArrayList<Point>();
 
         for (int y = 0; y < segmentCount; y++) {
             for (int x = 0; x < segmentCount; x++) {
@@ -189,12 +228,18 @@ public class ImageAnalysis {
                 }
 
                  if (RGBSum > distingushingThreshold) {
-                     // image.setRGB(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, RGBGenerator(255, 0, 0));
+
+                     // FUNCTION: ADD LANDMARK
+
+                     int pointX = segmentLength*x + segmentLength/2;
+                     int pointY = segmentLength*y + segmentLength/2;
+
+                     // image.setRGB(pointX, pointY, RGBGenerator(255, 0, 0));
                      Graphics2D g = (Graphics2D) imageCopy.getGraphics();
                      g.setColor(Color.RED);
                      g.setStroke(new BasicStroke(5));
-                     int dotsize = 5; // CHANGEABLE
-                     g.fillOval(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, dotsize, dotsize);
+
+                     g.fillOval(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, landmarkSize, landmarkSize);
                      // TODO: Store these points somewhere
                      // System.out.println(segmentLength*x + segmentLength/2 + ":" + (segmentLength*y + segmentLength/2) + " --> " + RGBSum);
                  }
@@ -205,10 +250,6 @@ public class ImageAnalysis {
 
         return imageCopy;
 
-    }
-
-    public static BufferedImage addLandmark (BufferedImage image, int x, int y) {
-        return image;
     }
 
     public static void printReverseRGB (int RGB) {
@@ -223,42 +264,6 @@ public class ImageAnalysis {
         int green = (RGB >> 8) & 0xFF;
         int blue = (RGB & 0xFF);
         return red + green + blue;
-    }
-
-
-    //////// DETECTING FEATURES OF FACE ////////
-
-    public static boolean detectHead () {
-
-    }
-
-    // Prepares image to be stored for training for the facial recognition
-    public static BufferedImage trainingReady(BufferedImage image) {
-
-        BufferedImage croppedImage;
-
-        // Crops image based on orientation
-        if (image.getHeight() <= image.getWidth())
-            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
-        else
-            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
-
-        // Greyscales image for analysis purposes
-        BufferedImage greyScaledImage = toGreyScalePixelInefficient(croppedImage);
-
-        // uses the ratio of 450
-        // BufferedImage resizedImage = resize( greyScaledImage , 100, 129);
-        BufferedImage resizedImage = resize( greyScaledImage , 200, 200);
-
-        // BufferedImage boldedImage = bold(resizedImage);
-
-        // Creates a glitched image to enhance features of face
-        BufferedImage glitchedImage = createGlitch(resizedImage);
-
-        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
-
-        return landmarkedImage;
-
     }
 
     // Kept in case of cloud storage requirements (not implemented in actual program)
