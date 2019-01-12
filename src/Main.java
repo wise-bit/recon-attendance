@@ -1,4 +1,6 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,6 +17,7 @@ public class Main {
     public static NewFace newface;
     public static TableData tabledata;
     public static StudentList studentlist;
+    public static Classify classify;
 
     public static String currentTeacher;
     public static String currentClass;
@@ -26,8 +29,12 @@ public class Main {
         init();
 
         // login = new Login();
+        // training = new TrainFace();
 
-        training = new TrainFace();
+
+        // Testing purposes
+        BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner1/image1.png"));
+        classify = new Classify(img);
 
     }
 
