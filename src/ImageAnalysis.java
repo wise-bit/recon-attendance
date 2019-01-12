@@ -14,7 +14,7 @@ public class ImageAnalysis {
 
     public static final int BLACK = RGBGenerator(0,0,0);
     public static final int WHITE = RGBGenerator(255,255,255);
-    public static final int sensitivity = -2000000;
+    public static final int sensitivity = -1000000;
     public static final int landmarkSize = 5;
     public static final int segmentation = 200;
 

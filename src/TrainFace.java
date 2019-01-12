@@ -208,7 +208,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
             }
 
             image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
-            image = ImageAnalysis.resize(image, 350, 350);
+            image = ImageAnalysis.resize(image, 200, 200);
 
             // Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(image);
