@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Classify {
 
@@ -21,8 +22,7 @@ public class Classify {
 
         setImage(img);
 
-        String filePath = "res/trainingSet/teacher1/learner1/";
-        ImageIO.write(ImageAnalysis.trainingReady(getImage()) , "PNG", new File(filePath + "Ximage1.png"));
+        assignheadHaar();
 
     }
 
@@ -37,26 +37,70 @@ public class Classify {
     }
 
     // FIND HEAD
-    public void assignheadHaar() {
+    public void assignheadHaar() throws IOException {
 
-        for (int y = 0; y < image.getHeight() - Classifiers.pixelAccuracy; y+=Classifiers.pixelAccuracy) {
-            for (int x = 0; x < image.getWidth() - Classifiers.pixelAccuracy; x+=Classifiers.pixelAccuracy) {
+        int top_length = 0;
+        int[] coords = new int[3];
 
-                // Checks for total area score
-                int sectorScore = 0;
+        for (int y = 0; y < image.getHeight()/Classifiers.pixelAccuracy-2; y++) {
+            for (int x = 0; x < image.getWidth()/Classifiers.pixelAccuracy-2; x++) {
 
-                for (int j = 0; j < Classifiers.pixelAccuracy; j++) {
-                    for (int i = 0; i < Classifiers.pixelAccuracy; i++) {
-                        sectorScore += ImageAnalysis.comprehensiveRGB(image.getRGB(x*Classifiers.pixelAccuracy+i, y*Classifiers.pixelAccuracy+j));
+                System.out.print("round " + x + " - ");
+
+                int currentLength = 0;
+
+                while (true) {
+
+                    // Checks for total area score
+                    int sector1Score = 0;
+                    int sector2Score = 0;
+
+                    for (int j = 0; j < Classifiers.pixelAccuracy; j++) {
+                        for (int i = 0; i < Classifiers.pixelAccuracy; i++) {
+                            if ((x + currentLength) * Classifiers.pixelAccuracy + i >= image.getWidth()) {
+                                break;
+                            }
+                            sector1Score += ImageAnalysis.comprehensiveRGB(
+                                    image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
+                                    y * Classifiers.pixelAccuracy + j));
+                            sector2Score += ImageAnalysis.comprehensiveRGB(
+                                    image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
+                                    y * Classifiers.pixelAccuracy + j + Classifiers.pixelAccuracy));
+                        }
+                    }
+
+                    currentLength++;
+
+                    System.out.println(currentLength);
+
+                    // NOTE: higher score means lighter color
+
+                    if (sector2Score - sector1Score > 10000) {
+                        continue;
+                    } else {
+                        if (currentLength > top_length) {
+                            top_length = currentLength;
+                            coords[0] = x * Classifiers.pixelAccuracy;
+                            coords[1] = (x + currentLength) * Classifiers.pixelAccuracy;
+                            coords[2] = y * Classifiers.pixelAccuracy;
+                            currentLength = 0;
+                        }
+                        break;
                     }
                 }
 
-                // NOTE: higher score means lighter color
-
-                // TODO: COMPLETE THIS METHOD
-
             }
         }
+
+        System.out.println(top_length + ", which is, " + Arrays.toString(coords));
+
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
+
+        String filePath = "res/trainingSet/teacher1/learner1/";
+        ImageIO.write(getImage() , "PNG", new File(filePath + "Ximage1.png"));
 
     }
 }

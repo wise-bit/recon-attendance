@@ -47,7 +47,7 @@ public class ImageAnalysis {
         BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
 
         // TODO: Change this line
-        return greyScaledImage;
+        return resizedImage;
 
     }
 

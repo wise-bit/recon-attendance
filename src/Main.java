@@ -33,8 +33,8 @@ public class Main {
 
 
         // Testing purposes
-        BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner1/image1.png"));
-        classify = new Classify(img);
+        BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner1/image2.jpg"));
+        classify = new Classify(ImageAnalysis.trainingReady(img));
 
     }
 
