@@ -2,10 +2,12 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 public class Main {
@@ -33,8 +35,13 @@ public class Main {
 
 
         // Testing purposes
-        BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner1/image2.jpg"));
-        classify = new Classify(ImageAnalysis.trainingReady(img));
+
+        String imagesPath = "res/trainingSet/teacher1/learner2/";
+        String[] imagesToCheck = listFiles(imagesPath);
+        for (String image : imagesToCheck) {
+            BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner2/" + image));
+            classify = new Classify(ImageAnalysis.trainingReady(img), image);
+        }
 
     }
 
@@ -60,6 +67,24 @@ public class Main {
             allClasses.add(new Classroom(filename, countFolders("res/attendanceData/teacher1/" + filename)));
         }
 
+    }
+
+    public static String[] listFiles(String path) {
+        File folder = new File(path);
+        File[] listOfFiles = folder.listFiles();
+        ArrayList<String> names = new ArrayList<String>();
+
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isFile())
+                names.add(listOfFiles[i].getName());
+        }
+
+        String[] namesArray = new String[names.size()];
+        for (int i = 0; i < names.size(); i++) {
+            namesArray[i] = names.get(i);
+        }
+
+        return namesArray;
     }
 
     public static String[] listFilesFolders(String path) {

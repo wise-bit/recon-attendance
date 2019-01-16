@@ -27,15 +27,15 @@ public class ImageAnalysis {
     // Prepares image to be stored for training for the facial recognition
     public static BufferedImage trainingReady(BufferedImage image) {
 
-//        BufferedImage croppedImage;
-//        // Crops image based on orientation
-//        if (image.getHeight() <= image.getWidth())
-//            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
-//        else
-//            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
+        BufferedImage croppedImage;
+        // Crops image based on orientation
+        if (image.getHeight() <= image.getWidth())
+            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+        else
+            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
 
         // Greyscales image for analysis purposes
-        BufferedImage greyScaledImage = toGreyScalePixelInefficient(image);
+        BufferedImage greyScaledImage = toGreyScalePixelInefficient(croppedImage);
 
         // uses the ratio of 450
         // BufferedImage resizedImage = resize( greyScaledImage , 100, 129);
@@ -43,11 +43,13 @@ public class ImageAnalysis {
 
         // BufferedImage boldedImage = bold(resizedImage);
         // Creates a glitched image to enhance features of face
-        BufferedImage glitchedImage = createGlitch(resizedImage);
-        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
+//        BufferedImage glitchedImage = createGlitch(resizedImage);
+//        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
 
         // TODO: Change this line
+        // return resizedImage;
         return resizedImage;
+        // return (resizedImage, (resizedImage.getWidth() - resizedImage.getHeight())/2, 0, resizedImage.getHeight(), resizedImage.getHeight());
 
     }
 
