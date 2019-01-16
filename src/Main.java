@@ -1,14 +1,14 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.stream.Stream;
+import java.awt.GraphicsEnvironment;
 
 public class Main {
 
@@ -26,22 +26,19 @@ public class Main {
 
     public static ArrayList<Classroom> allClasses;
 
+    public static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
     public static void main(String[] args) throws IOException {
 
         init();
 
-        // login = new Login();
+        listFonts();
+
+        login = new Login();
         // training = new TrainFace();
 
-
         // Testing purposes
-
-        String imagesPath = "res/trainingSet/teacher1/learner2/";
-        String[] imagesToCheck = listFiles(imagesPath);
-        for (String image : imagesToCheck) {
-            BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner2/" + image));
-            classify = new Classify(ImageAnalysis.trainingReady(img), image);
-        }
+        // trainTestDataset();
 
     }
 
@@ -139,5 +136,24 @@ public class Main {
         frame.validate();
         frame.repaint();
     }
+
+    // Used to test by using images from downloaded dataset
+    public static void trainTestDataset() throws IOException {
+        String imagesPath = "res/trainingSet/teacher1/learner2/";
+        String[] imagesToCheck = listFiles(imagesPath);
+        for (String image : imagesToCheck) {
+            BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner2/" + image));
+            classify = new Classify(ImageAnalysis.trainingReady(img), image);
+        }
+    }
+
+    // Lists fonts
+    public static void listFonts() {
+        String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        for ( int i = 0; i < fonts.length; i++ ) {
+            System.out.println(fonts[i]);
+        }
+    }
+
 
 }

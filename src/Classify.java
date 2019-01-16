@@ -109,10 +109,10 @@ public class Classify {
             }
         }
 
-//        Graphics2D g = (Graphics2D) getImage().getGraphics();
-//        g.setColor(Color.RED);
-//        g.setStroke(new BasicStroke(5));
-//        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
 
         headLength = Math.abs(coords[1] - coords[0]);
         headX1 = coords[0];
@@ -162,8 +162,10 @@ public class Classify {
         zoneIntensities[0] = 100000;
         zoneIntensities[1] = 100000;
 
+        System.out.println(headX2/eyeLength + " " + pixelatedImage.getWidth());
+
         for (int y = headY/eyeLength; y < pixelatedImage.getHeight()/2+1; y++) {
-            for (int x = 0; x < pixelatedImage.getWidth()-2; x++) {
+            for (int x = 0; x < headX2/eyeLength; x++) {
                 int zone1 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x, y));
                 int zone2 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x+1, y));
                 int zone3 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x+2, y));
@@ -194,6 +196,10 @@ public class Classify {
 
         String filePath = "res/trainingSet/teacher1/learner2/";
         ImageIO.write(image , "PNG", new File(filePath + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
+
+        if (zoneIntensities[0] == 100000 && zoneIntensities[1] == 100000) {
+            System.out.println("not a face");
+        }
 
     }
 
