@@ -1,3 +1,13 @@
+/**
+ * Author: Satrajit
+ */
+
+/**
+ *
+ * @author: Satrajit Chatterjee
+ *
+ */
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -7,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.stream.Stream;
 import java.awt.GraphicsEnvironment;
 
@@ -25,16 +36,21 @@ public class Main {
     public static String currentClass;
 
     public static ArrayList<Classroom> allClasses;
+    public static ArrayList<Teacher> teacherAccounts;
 
     public static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+    public static String lastUsername = "";
+    public static String lastPassword = "";
 
     public static void main(String[] args) throws IOException {
 
         init();
 
-        listFonts();
+        // listFonts();
 
         login = new Login();
+
         // training = new TrainFace();
 
         // Testing purposes
@@ -42,6 +58,10 @@ public class Main {
 
     }
 
+    /**
+     * Initializes the elements of the program such as the list of teachers
+     * @throws IOException
+     */
     public static void init() throws IOException {
 
         // Sample data to be removed later (maybe keep for failsafe?)
@@ -64,8 +84,27 @@ public class Main {
             allClasses.add(new Classroom(filename, countFolders("res/attendanceData/teacher1/" + filename)));
         }
 
+
+        // Adding all teacher accounts to memory
+
+        teacherAccounts = new ArrayList<Teacher>();
+
+        File accountsFile = new File("res/accounts.txt");
+        Scanner fileReader = new Scanner(accountsFile);
+
+        while (fileReader.hasNextLine()) {
+            String[] line = fileReader.nextLine().split(",");
+            teacherAccounts.add(new Teacher(line[0], line[1]));
+        }
+
     }
 
+    /**
+     * Lists all fles in a folder
+     *
+     * @param path
+     * @return namesArray
+     */
     public static String[] listFiles(String path) {
         File folder = new File(path);
         File[] listOfFiles = folder.listFiles();
@@ -84,8 +123,14 @@ public class Main {
         return namesArray;
     }
 
+    /**
+     * @param path
+     * @return directories
+     */
     public static String[] listFilesFolders(String path) {
         File file = new File(path);
+
+        // Lambda expression source: http://www.javased.com/index.php?api=java.io.FilenameFilter
         String[] directories = file.list(new FilenameFilter() {
             @Override
             public boolean accept(File current, String name) {
@@ -95,33 +140,40 @@ public class Main {
         return directories;
     }
 
-    // Counts lines in a txt/csv file
+    /**
+     * Counts lines in a txt/csv file
+     *
+     * @param filename
+     * @return lines
+     * @throws IOException
+     */
     public static int countLines(String filename) throws IOException {
-        InputStream is = new BufferedInputStream(new FileInputStream(filename));
-        try {
-            byte[] c = new byte[1024];
-            int count = 0;
-            int readChars = 0;
-            boolean empty = true;
-            while ((readChars = is.read(c)) != -1) {
-                empty = false;
-                for (int i = 0; i < readChars; ++i) {
-                    if (c[i] == '\n') {
-                        ++count;
-                    }
-                }
-            }
-            return (count == 0 && !empty) ? 1 : count;
-        } finally {
-            is.close();
+
+        int lines = 0;
+
+        Scanner scanner = new Scanner(new File(filename));
+
+        while (scanner.hasNextLine()) {
+            scanner.nextLine();
+            lines++;
         }
+
+        return lines;
+
     }
 
-    // Counts folders in a folder
+    /**
+     * Counts folders in a folder
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
     public static int countFolders(String path) throws IOException {
 
         long count;
 
+        // Stream code: https://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java
         try (Stream<Path> files = Files.list(Paths.get(path))) {
             count = files.count();
         }
@@ -130,14 +182,22 @@ public class Main {
 
     }
 
-    // Used to refresh any jframe
+    /**
+     *Used to refresh any jframe
+     *
+     * @param frame
+     */
     public void refresh(JFrame frame) {
         frame.invalidate();
         frame.validate();
         frame.repaint();
     }
 
-    // Used to test by using images from downloaded dataset
+    /**
+     * Used to test by using images from downloaded dataset
+     *
+     * @throws IOException
+     */
     public static void trainTestDataset() throws IOException {
         String imagesPath = "res/trainingSet/teacher1/learner2/";
         String[] imagesToCheck = listFiles(imagesPath);
@@ -147,7 +207,9 @@ public class Main {
         }
     }
 
-    // Lists fonts
+    /**
+     * Lists fonts
+     */
     public static void listFonts() {
         String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
         for ( int i = 0; i < fonts.length; i++ ) {

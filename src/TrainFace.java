@@ -1,3 +1,5 @@
+
+// Import from https://github.com/sarxos/webcam-capture
 import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
@@ -117,7 +119,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
         } else {
             JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam...",
-                    "A plain message", JOptionPane.PLAIN_MESSAGE);
+                    "Message", JOptionPane.PLAIN_MESSAGE);
         }
 
         // webcamPanel.add(fpsPanel);
@@ -153,7 +155,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         save.addActionListener(this);
         save.setBackground(Color.WHITE);
         save.setForeground(Color.BLACK);
-        save.setBorderPainted(false);
+        // save.setBorderPainted(false);
         buttons.add(save);
 
         add(buttons, BorderLayout.PAGE_END);

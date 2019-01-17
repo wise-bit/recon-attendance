@@ -1,10 +1,17 @@
+import com.github.sarxos.webcam.Webcam;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class Login extends JFrame implements ActionListener {
 
@@ -13,7 +20,22 @@ public class Login extends JFrame implements ActionListener {
     JTextField usernameBox = new JTextField();
     JPasswordField passwordBox = new JPasswordField();
 
+    JLabel informationLine = new JLabel();
+
     JButton login = new JButton("Login");
+    JButton signup = new JButton("Sign Up");
+
+    Webcam webcam = Webcam.getDefault();
+    BufferedImage image;
+    JLabel imageLbl = new JLabel();
+    Border b = BorderFactory.createLineBorder(Color.WHITE, 5, true);
+    int delay = 30;
+    private Timer timer=new Timer(delay, this);
+
+    public static final int imageWidth = 300;
+    public static final int imageHeight = 300;
+
+    boolean accessGranted = false;
 
     public Login() throws IOException {
 
@@ -26,13 +48,19 @@ public class Login extends JFrame implements ActionListener {
 
         // getContentPane().setBackground(Color.YELLOW);
 
-
         JLabel title = new JLabel("Reconattendance: Login", SwingConstants.CENTER);
         title.setBounds(0, 20, 1000, 50);
         title.setFont(new Font("Microsoft YaHei", Font.BOLD, 24));
         title.setVisible(true);
         title.setForeground(Color.YELLOW);
         add(title);
+
+        informationLine = new JLabel("<HTML><div style='text-align: center;'>The sign up button works using this form as well for convenience, " +
+                "so please enter your information before pressing sign up!</div></HTML>");
+        informationLine.setForeground(Color.WHITE);
+        informationLine.setBounds(100, 250, 325, 70);
+        add(informationLine);
+
 
         // Asks the questions
 
@@ -63,17 +91,155 @@ public class Login extends JFrame implements ActionListener {
         passwordBox.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
         add(passwordBox);
 
+        usernameBox.setText(Main.lastUsername);
+        passwordBox.setText(Main.lastPassword);
 
         // Adds Button
 
+        login.setBounds(this.getWidth()/2 - 50 - 70, this.getHeight() - 100, 100, 50);
+        login.setBackground(new Color(154, 224, 247));
+        login.setForeground(Color.WHITE);
+        //login.setFocusPainted(false);
+        login.setFont(new Font("Tahoma", Font.BOLD, 14));
+        login.addActionListener(this);
+        add(login);
+        
+        signup.setBounds(this.getWidth()/2 - 50 + 70, this.getHeight() - 100, 100, 50);
+        signup.setBackground(new Color(154, 224, 247));
+        signup.setForeground(Color.WHITE);
+        //signup.setFocusPainted(false);
+        signup.setFont(new Font("Tahoma", Font.BOLD, 14));
+        signup.addActionListener(this);
+        add(signup);
 
+        try {
 
+            webcam.open();
+
+            if (webcam.isOpen()) { //if web cam open
+                image = webcam.getImage();
+                imageLbl = new JLabel();
+                // imageLbl.setSize(1024, 720);
+                Image dimg = image.getScaledInstance(450, 350, Image.SCALE_SMOOTH);
+                imageLbl.setIcon(new ImageIcon(dimg));
+
+//            imageLbl.setHorizontalAlignment(JLabel.CENTER);
+//            imageLbl.setVerticalAlignment(JLabel.CENTER);
+
+                imageLbl.setBorder(b);
+                imageLbl.setBounds(600, 75, imageWidth, imageHeight); // TODO: FIX
+                add(imageLbl);
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
+                        "Fatal Error", JOptionPane.PLAIN_MESSAGE);
+            }
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
+                    "Fatal Error", JOptionPane.PLAIN_MESSAGE);
+
+        }
+
+        JLabel faceFrame = new JLabel("Say Cheese!", SwingConstants.CENTER);
+        faceFrame.setForeground(Color.WHITE);
+        faceFrame.setFont(new Font("Tahoma", Font.BOLD + Font.ITALIC, 18));
+        faceFrame.setBounds(50, 50, imageLbl.getWidth()-100, imageLbl.getHeight()-100);
+        faceFrame.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
+        imageLbl.add(faceFrame);
+
+        timer.start();
         setVisible(true);
 
     }
 
+    /**
+     * Action Listener methods
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        if (e.getSource() == login) {
+
+            if (usernameBox.getText().contains(",") || usernameBox.getText().length() == 0) {
+                JOptionPane.showMessageDialog(null, "Invalid username", "Error", JOptionPane.INFORMATION_MESSAGE);
+            } else if (String.valueOf(passwordBox.getPassword()).contains(",") || String.valueOf(passwordBox.getPassword()).length() == 0) {
+                JOptionPane.showMessageDialog(null, "Invalid password", "Error", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                String currentUserInput = usernameBox.getText();
+                String currentPasswordInput = Encryption.encrypt(String.valueOf(passwordBox.getPassword()));
+
+                for (Teacher t : Main.teacherAccounts) {
+                    if (t.getName().equals(currentUserInput) && t.getEncodedPassword().equals(currentPasswordInput)) {
+                        JOptionPane.showMessageDialog(null, "Welcome " + t.getName() + "!", "Message", JOptionPane.INFORMATION_MESSAGE);
+                        Main.currentTeacher = t.getName();
+                        accessGranted = true;
+                        break;
+                    }
+                }
+
+                // Doesn't say if it is the username or the password that is wrong, for the sake of security which
+                // prevents people from guessing any details
+                if (!accessGranted) {
+                    JOptionPane.showMessageDialog(null, "Invalid details, please try again ", "Error", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+
+        }
+
+        // If user presses the signup button
+        if (e.getSource() == signup) {
+
+            try {
+                if (usernameBox.getText().contains(",") || usernameBox.getText().length() == 0) {
+                    JOptionPane.showMessageDialog(null, "Invalid username", "Error", JOptionPane.INFORMATION_MESSAGE);
+                } else if (String.valueOf(passwordBox.getPassword()).contains(",") || String.valueOf(passwordBox.getPassword()).length() == 0) {
+                    JOptionPane.showMessageDialog(null, "Invalid password", "Error", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    Main.lastUsername = usernameBox.getText();
+                    Main.lastPassword = String.valueOf(passwordBox.getPassword());
+                    String stringToWrite = "\n" + usernameBox.getText() + "," + Encryption.encrypt(String.valueOf(passwordBox.getPassword()));
+                    Files.write(Paths.get("res/accounts.txt"), stringToWrite.getBytes(), StandardOpenOption.APPEND);
+                    Main.login.dispose();
+                    Main.init();
+                    Main.login = new Login();
+                }
+            }catch (IOException error) {
+                System.out.println(error.getMessage());
+            }
+
+        }
+
+        if (e.getSource() == timer) {
+
+            image = webcam.getImage();
+
+            imageLbl.setVisible(false);
+
+            // FUNCTION: FLIP
+
+            for (int i=0;i<image.getWidth()/2;i++) {
+                for (int j = 0; j < image.getHeight(); j++) {
+                    int tmp = image.getRGB(i, j);
+
+                    image.setRGB(i, j, image.getRGB(image.getWidth() - i - 1, j));
+                    image.setRGB(image.getWidth() - i - 1, j, tmp);
+
+                }
+            }
+
+            image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+            image = ImageAnalysis.resize(image, imageHeight, imageWidth);
+
+            // Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            ImageIcon imageIcon = new ImageIcon(image);
+            imageIcon.getImage().flush();
+            imageLbl.setIcon(imageIcon);
+            imageLbl.setVisible(true);
+
+        }
 
     }
 }

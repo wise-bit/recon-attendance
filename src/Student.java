@@ -11,8 +11,8 @@ public class Student implements Person {
     }
 
     @Override
-    public String setName() {
-        return null;
+    public void setName(String name) {
+        this.name = name;
     }
 
 }
