@@ -23,7 +23,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
     public static final int imageWidth = 450;
     public static final int imageHeight = 350;
 
-    JLabel title = new JLabel("Add more phases of faces");
+    JLabel title;
 
     JLabel askName = new JLabel("Name: ");
     JComboBox nameBox = new JComboBox();
@@ -43,66 +43,47 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
     JComboBox nameChoser;
 
-    Border b = BorderFactory.createLineBorder(Color.BLACK, 5, true);
+    Border b = BorderFactory.createLineBorder(Color.WHITE, 5, true);
 
-    public TrainFace() {
+    public TrainFace() throws IOException {
 
-        setSize(1000, 700);
+        setSize(500, 700);
+
+        setLocation((int) (Main.dim.getWidth()/2), 0);
+
         setTitle("Scan your face");
-        setLayout(new BorderLayout());
+        setLayout(null);
 
         Color bg = new Color(194, 220, 25);
 
-        this.getContentPane().setBackground(bg);
+        // this.getContentPane().setBackground(bg);
+
+        setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("res/background.jpeg")))));
 
         webcam = Webcam.getDefault();
         webcam.open();
-
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(new Color(135, 156, 21));
 
         title = new JLabel("Train Your Face Further", SwingConstants.CENTER);
         title.setFont(new Font("Verdana", Font.BOLD, 24));
         title.setForeground(Color.WHITE);
         title.setPreferredSize(new Dimension(1000, 50));
-        titlePanel.add(title);
-
-        add(titlePanel, BorderLayout.PAGE_START);
-
-
-        // Main panel
-
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-        mainPanel.setBackground(bg);
-
-        JPanel webcamPanel = new JPanel();
-        webcamPanel.setBackground(bg);
-
+        title.setBounds(0, 10, getWidth(), 50);
+        title.setVisible(true);
+        add(title);
         // JPanel placeHolderPanel1 = new JPanel(new BorderLayout(0,50));
 
-        mainPanel.add(Box.createRigidArea(new Dimension(5,50)));
-
-        JPanel askforname = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-        askforname.setBackground(bg);
-
-        JLabel askName = new JLabel("Name: ");
-        askName.setFont(new Font("Ariel", Font.ITALIC + Font.BOLD, 18));
-        askforname.add(askName);
+        JLabel askName = new JLabel("Name: ", SwingConstants.CENTER);
+        askName.setFont(new Font("Verdana", Font.BOLD, 18));
+        askName.setBounds(0, 70, getWidth(), 20);
+        add(askName);
 
         nameChoser = new JComboBox(Main.listFilesFolders("res/trainingSet/" + Main.currentTeacher));
         nameChoser.setVisible(true);
         int nameChoserWidth = 200;
         int nameChoserHeight = 30;
-        nameChoser.setPreferredSize(new Dimension(nameChoserWidth, nameChoserHeight));
-        nameChoser.setMinimumSize(new Dimension(nameChoserWidth, nameChoserHeight));
-        nameChoser.setMaximumSize(new Dimension(nameChoserWidth, nameChoserHeight));
-        askforname.add(nameChoser);
+        nameChoser.setBounds((getWidth() - nameChoserWidth)/2, 100, nameChoserWidth, nameChoserHeight);
+        add(nameChoser);
 
-        // Components - name chooser combo box
-        mainPanel.add(askforname);
-
-        mainPanel.add(Box.createRigidArea(new Dimension(5,30)));
 
         if (webcam.isOpen()) { //if web cam open
             image = webcam.getImage();
@@ -115,34 +96,29 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 //            imageLbl.setVerticalAlignment(JLabel.CENTER);
 
             imageLbl.setBorder(b);
-            webcamPanel.add(imageLbl);
+            imageLbl.setBounds((getWidth() - 400)/2, 160, 400, 400);
+            add(imageLbl);
 
         } else {
             JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam...",
                     "Message", JOptionPane.PLAIN_MESSAGE);
         }
 
-        // webcamPanel.add(fpsPanel);
-        mainPanel.add(webcamPanel);
-
-        JPanel fpsPanel = new JPanel(new GridLayout(2, 1));
-        fpsPanel.setBackground(new Color(226, 255, 28));
-
         fpsCountLabel = new JLabel("FPS: " + (int)(1000/delay), SwingConstants.CENTER);
-        fpsPanel.add(fpsCountLabel);
+        fpsCountLabel.setBounds(0, 560, getWidth(), 20);
+        fpsCountLabel.setVisible(true);
+        add(fpsCountLabel);
+
         slider = new JSlider(10, 60);
-        slider.setBackground(new Color(226, 255, 28));
+        slider.setOpaque(false); //?
         slider.addChangeListener(this);
-        fpsPanel.add(slider, BorderLayout.SOUTH);
-
-        mainPanel.add(fpsPanel);
-
-        add(mainPanel, BorderLayout.CENTER);
+        slider.setBounds(10, 580, getWidth()-10, 50);
+        add(slider);
 
         // Buttons
         JPanel buttons = new JPanel();
         buttons.setBackground(new Color(0, 0, 0));
-        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
+        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 10));
 
         // TODO: Add buttons
 
@@ -158,7 +134,9 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         // save.setBorderPainted(false);
         buttons.add(save);
 
-        add(buttons, BorderLayout.PAGE_END);
+        buttons.setBounds(0, 620, getWidth(), 50);
+
+        add(buttons);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -210,7 +188,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
             }
 
             image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
-            image = ImageAnalysis.resize(image, 200, 200);
+            image = ImageAnalysis.resize(image, 400, 400);
 
             // Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
             ImageIcon imageIcon = new ImageIcon(image);

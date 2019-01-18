@@ -127,7 +127,7 @@ public class Login extends JFrame implements ActionListener {
 //            imageLbl.setVerticalAlignment(JLabel.CENTER);
 
                 imageLbl.setBorder(b);
-                imageLbl.setBounds(600, 75, imageWidth, imageHeight); // TODO: FIX
+                imageLbl.setBounds(600, 75, imageWidth, imageHeight);
                 add(imageLbl);
 
             } else {
@@ -154,6 +154,17 @@ public class Login extends JFrame implements ActionListener {
 
     }
 
+    public boolean unique() {
+
+        for (Teacher t : Main.teacherAccounts) {
+            if (t.getName().equals(usernameBox.getText())) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+
     /**
      * Action Listener methods
      * @param e
@@ -175,6 +186,7 @@ public class Login extends JFrame implements ActionListener {
                     if (t.getName().equals(currentUserInput) && t.getEncodedPassword().equals(currentPasswordInput)) {
                         JOptionPane.showMessageDialog(null, "Welcome " + t.getName() + "!", "Message", JOptionPane.INFORMATION_MESSAGE);
                         Main.currentTeacher = t.getName();
+                        Main.currentPassword = t.getEncodedPassword();
                         accessGranted = true;
                         break;
                     }
@@ -184,6 +196,13 @@ public class Login extends JFrame implements ActionListener {
                 // prevents people from guessing any details
                 if (!accessGranted) {
                     JOptionPane.showMessageDialog(null, "Invalid details, please try again ", "Error", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    Main.login.dispose();
+                    try {
+                        Main.intermediatePage = new IntermediatePage();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
 
@@ -198,13 +217,29 @@ public class Login extends JFrame implements ActionListener {
                 } else if (String.valueOf(passwordBox.getPassword()).contains(",") || String.valueOf(passwordBox.getPassword()).length() == 0) {
                     JOptionPane.showMessageDialog(null, "Invalid password", "Error", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    Main.lastUsername = usernameBox.getText();
-                    Main.lastPassword = String.valueOf(passwordBox.getPassword());
-                    String stringToWrite = "\n" + usernameBox.getText() + "," + Encryption.encrypt(String.valueOf(passwordBox.getPassword()));
-                    Files.write(Paths.get("res/accounts.txt"), stringToWrite.getBytes(), StandardOpenOption.APPEND);
-                    Main.login.dispose();
-                    Main.init();
-                    Main.login = new Login();
+
+                    if (unique()) {
+
+                        Main.lastUsername = usernameBox.getText();
+                        Main.lastPassword = String.valueOf(passwordBox.getPassword());
+                        String stringToWrite = "\n" + usernameBox.getText() + "," + Encryption.encrypt(String.valueOf(passwordBox.getPassword()));
+                        Files.write(Paths.get("res/accounts.txt"), stringToWrite.getBytes(), StandardOpenOption.APPEND);
+
+                        // Makes a new folder in the attendance data folder to keep track of each day's attendance for each student
+                        new File("res/attendanceData/" + usernameBox.getText()).mkdir();
+
+                        // Makes a new file in the student information folder to keep track of a student's name and studentID
+                        new File("res/studentInformation/" + Main.currentTeacher + ".txt").createNewFile();
+                        Main.login.dispose();
+                        Main.init();
+                        Main.login = new Login();
+
+                    } else {
+
+                        JOptionPane.showMessageDialog(null, "Username already exists, plase try again!\n" +
+                                "If you have forgotten your password, please contact the administrator.", "Error", JOptionPane.INFORMATION_MESSAGE);
+
+                    }
                 }
             }catch (IOException error) {
                 System.out.println(error.getMessage());

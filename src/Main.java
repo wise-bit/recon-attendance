@@ -6,6 +6,42 @@
  *
  * @author: Satrajit Chatterjee
  *
+ ********************************************
+ * Reconattendance - ICS4U1 - final project *
+ ********************************************
+ *
+ * Name:
+ *      Satrajit Chatterjee
+ *
+ * Date:
+ *      January 18, 2019
+ *
+ * Course Code:
+ *      ICS4U1 - Period 5 - Semester 1
+ *
+ * Title:
+ *      Reconattendance (A combination of reconnaissance and attendance)
+ *
+ * Description:
+ *
+ *
+ * Features:
+ *
+ *
+ * Major Skills:
+ *
+ *
+ * Area of concern:
+ *      (i) The program uses a Webcam library, which was impossible to be coded natively in Java, hence it is based on C
+ *      code to access hardware. Although tested thoroughly, the webcam interface may fail in specific situations such
+ *      as unsupported webcams, which is still fixable through minor tweakings
+ *
+ *      (ii) The algorithm used in this program is built from the ground up, from scratch. Therefore, it has very minimal
+ *      training concerning machine learning, and the mathematical capabilities of the models are incomparable to other projects
+ *      such as OpenCV. Therefore, the results may often be false.
+ *
+ *
+ *
  */
 
 import javax.imageio.ImageIO;
@@ -31,9 +67,11 @@ public class Main {
     public static TableData tabledata;
     public static StudentList studentlist;
     public static Classify classify;
+    public static IntermediatePage intermediatePage;
 
-    public static String currentTeacher;
-    public static String currentClass;
+    public static String currentTeacher = "";
+    public static String currentPassword = "";
+    public static String currentClass = "";
 
     public static ArrayList<Classroom> allClasses;
     public static ArrayList<Teacher> teacherAccounts;
@@ -51,7 +89,8 @@ public class Main {
 
         login = new Login();
 
-        // training = new TrainFace();
+        // training = new TrainFace(); // move this to login sreen
+        // newface = new NewFace();
 
         // Testing purposes
         // trainTestDataset();
@@ -64,14 +103,11 @@ public class Main {
      */
     public static void init() throws IOException {
 
-        // Sample data to be removed later (maybe keep for failsafe?)
-        currentTeacher = "teacher1";
-        currentClass = "ICS4U1";
-
         // Initializing allClasses
-
         allClasses = new ArrayList<Classroom>();
 
+        // Add classes to arraylist based on which files exist in the folder
+        // where each folder is assigned for one class
         File file = new File("res/attendanceData/teacher1/");
         String[] directoriesOfClasses = file.list(new FilenameFilter() {
             @Override
@@ -203,6 +239,10 @@ public class Main {
         String[] imagesToCheck = listFiles(imagesPath);
         for (String image : imagesToCheck) {
             BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner2/" + image));
+
+//            String filePath = "res/trainingSet/teacher1/learner2/glitchartstorage/";
+//            ImageIO.write(ImageAnalysis.furtherModifcation(img), "PNG", new File(filePath + "X" + image.substring(0, image.length()-4) + ".png"));
+
             classify = new Classify(ImageAnalysis.trainingReady(img), image);
         }
     }

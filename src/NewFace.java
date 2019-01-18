@@ -12,7 +12,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class NewFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
 
@@ -20,17 +22,17 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
     public static String tempID = "";
 
     // initial ratio is 450 by 350
-    public static final int imageWidth = 300;
-    public static final int imageHeight = 240;
+    public static final int imageWidth = 400;
+    public static final int imageHeight = 400;
 
     JLabel title;
 
     JLabel askName = new JLabel("Name: ");
-    JLabel askEmail = new JLabel("Email");
-    JLabel askTeacherPassword = new JLabel("Teacher's authorization");
+    JLabel askEmail = new JLabel("Email: ");
+    JLabel askTeacherPassword = new JLabel("Authorization");
 
-    JTextField nameField;
-    JTextField studentIDField;
+    JTextField nameField = new JTextField();
+    JTextField studentIDField  =new JTextField();
     JTextField teacherPasswordBox = new JTextField();
 
     JButton register = new JButton("Take Snapshot");
@@ -45,88 +47,133 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     int delay = 30;
 
-    private Timer timer=new Timer(delay, this);
+    private Timer timer = new Timer(delay, this);
 
     Border b = BorderFactory.createLineBorder(Color.BLACK, 5, true);
 
-    public NewFace() {
+    public NewFace() throws IOException {
 
-        setSize(720, 480);
-        setTitle("Scan your face");
-        setLayout(new BorderLayout());
+        setSize(1000, 600);
+        setLocation((int) Main.dim.getWidth() / 2 - 500, (int) Main.dim.getHeight() / 2 - 250);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Login to Reconattendance");
+
+        setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("res/background.jpeg")))));
+
+
+        title = new JLabel("Add New Face", SwingConstants.CENTER);
+        title.setForeground(Color.WHITE);
+        title.setFont(new Font("Verdana", Font.BOLD, 24));
+        title.setBounds(0, 20, 1000, 50);
+        add(title);
+
+        // Main panel
 
         webcam = Webcam.getDefault();
         webcam.open();
 
-        title = new JLabel("Add New Face", SwingConstants.CENTER);
-        title.setFont(new Font("Verdana", Font.BOLD, 24));
-        add(title, BorderLayout.PAGE_START);
+        try {
 
-        // Main panel
+            webcam.open();
 
-        JPanel mainPanel = new JPanel(new GridLayout(1, 2));
+            if (webcam.isOpen()) { //if web cam open
+                image = webcam.getImage();
+                imageLbl = new JLabel();
+                // imageLbl.setSize(1024, 720);
+                Image dimg = image.getScaledInstance(450, 350, Image.SCALE_SMOOTH);
+                imageLbl.setIcon(new ImageIcon(dimg));
 
-        JPanel webcamPanel = new JPanel(new GridLayout(2, 1));
+//            imageLbl.setHorizontalAlignment(JLabel.CENTER);
+//            imageLbl.setVerticalAlignment(JLabel.CENTER);
 
-        if (webcam.isOpen()) { //if web cam open
-            image = webcam.getImage();
-            imageLbl = new JLabel();
-            // imageLbl.setSize(1024, 720);
-            Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
-            imageLbl.setIcon(new ImageIcon(dimg));
+                imageLbl.setBorder(b);
+                imageLbl.setBounds(500, 75, imageWidth, imageHeight);
+                add(imageLbl);
 
-            imageLbl.setHorizontalAlignment(JLabel.CENTER);
-            imageLbl.setVerticalAlignment(JLabel.CENTER);
+            } else {
+                JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
+                        "Fatal Error", JOptionPane.PLAIN_MESSAGE);
+            }
 
-            imageLbl.setBorder(b);
+        } catch (Exception e) {
 
-            webcamPanel.add(imageLbl);
+            JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
+                    "Fatal Error", JOptionPane.PLAIN_MESSAGE);
 
-        } else {
-            JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam...",
-                    "A plain message", JOptionPane.PLAIN_MESSAGE);
         }
 
-        JPanel fpsPanel = new JPanel(new GridLayout(2, 1));
-        fpsCountLabel = new JLabel("FPS: " + (int)(1000/delay), SwingConstants.CENTER);
-        fpsPanel.add(fpsCountLabel);
+        fpsCountLabel = new JLabel("FPS: " + (int) (1000 / delay), SwingConstants.CENTER);
+        add(fpsCountLabel);
+
         slider = new JSlider(10, 60);
         slider.addChangeListener(this);
-        fpsPanel.add(slider, BorderLayout.SOUTH);
-
-        webcamPanel.add(fpsPanel);
-        mainPanel.add(webcamPanel);
+        add(slider);
 
         // Components
 
-        JPanel componentsMegaHolder = new JPanel(new GridLayout(2, 1));
+        // Form information
 
-        JPanel components = new JPanel(new GridLayout(4, 1, 0, 20));
+        // Questions asked
 
-        JPanel placeHolderPanel1 = new JPanel(new BorderLayout(0,50));
+        // Asked names
+        askName.setBounds(100, 150, 150, 20);
+        askName.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 18));
+        askName.setVisible(true);
+        askName.setForeground(Color.WHITE);
+        add(askName);
 
-        nameField = new JTextField("Name");
-        nameField.setHorizontalAlignment(JTextField.CENTER);
-        nameField.setEditable(true); // TODO: Set false when register is clicked
+        // Asked student ID
+        askEmail.setBounds(100, 200, 150, 20);
+        askEmail.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 18));
+        askEmail.setVisible(true);
+        askEmail.setForeground(Color.WHITE);
+        add(askEmail);
 
-        studentIDField = new JTextField("Student ID");
-        studentIDField.setHorizontalAlignment(JTextField.CENTER);
-        studentIDField.setEditable(true); // TODO: Set false when register is clicked
+        askTeacherPassword.setBounds(100, 350, 150, 20);
+        askTeacherPassword.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 18));
+        askTeacherPassword.setVisible(true);
+        askTeacherPassword.setForeground(Color.WHITE);
+        add(askTeacherPassword);
 
-        components.add(placeHolderPanel1);
-        components.add(nameField);
-        components.add(studentIDField);
 
-        componentsMegaHolder.add(components);
+        // Input field for name
+        nameField.setBounds(250, 150 - 10, 175, 40);
+        nameField.setOpaque(false);
+        nameField.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
+        nameField.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
+        add(nameField);
 
-        mainPanel.add(componentsMegaHolder);
-        add(mainPanel, BorderLayout.CENTER);
+        // Input field for studentID
+        studentIDField.setBounds(250, 200 - 10, 175, 40);
+        studentIDField.setOpaque(false);
+        studentIDField.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
+        studentIDField.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
+        add(studentIDField);
+
+        teacherPasswordBox.setBounds(250, 350 - 10, 175, 40);
+        teacherPasswordBox.setOpaque(false);
+        teacherPasswordBox.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
+        teacherPasswordBox.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
+        add(teacherPasswordBox);
 
 
         // Buttons
 
         JPanel buttons = new JPanel();
-        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 0));
+        buttons.setBackground(new Color(0, 0, 0));
+        buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 10));
+
+        register.addActionListener(this);
+        register.setBackground(Color.WHITE);
+        register.setForeground(Color.BLACK);
+        register.setBorderPainted(false);
+        buttons.add(register);
+
+        save.addActionListener(this);
+        save.setBackground(Color.WHITE);
+        save.setForeground(Color.BLACK);
+        save.setBorderPainted(false);
+        buttons.add(save);
 
         register.addActionListener(this);
         save.addActionListener(this);
@@ -134,7 +181,9 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         buttons.add(register);
         buttons.add(save);
 
-        add(buttons, BorderLayout.PAGE_END);
+        buttons.setBounds(0, getHeight()-100, getWidth(), 50);
+
+        add(buttons);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -150,83 +199,142 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
             }
         });
 
+        JLabel faceFrame = new JLabel("Place your face within this box", SwingConstants.CENTER);
+        faceFrame.setForeground(Color.WHITE);
+        faceFrame.setFont(new Font("Tahoma", Font.BOLD + Font.ITALIC, 18));
+        faceFrame.setBounds(50, 50, imageLbl.getWidth() - 100, imageLbl.getHeight() - 100);
+        faceFrame.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
+        imageLbl.add(faceFrame);
+
         timer.start();
-        this.setVisible(true);
+        setVisible(true);
 
     }
 
     @Override
-    public void saveNewState() {
+    public void saveNewState() throws FileNotFoundException {
+
+        if (tempName.equals("")) {
+            tempName = nameField.getText();
+        }
+        if (tempID.equals("")) {
+            tempID = studentIDField.getText();
+        }
+
+        // Error checks to ensure user has inputted something, while also to prevent commas in name
+        if (tempName.equals("Name") || tempID.contains(",")) {
+            JOptionPane.showMessageDialog(null, "Please enter a valid name", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            tempName = "";
+            tempID = "";
+        } else if (tempID.equals("Student ID") || tempID.length() != 9 || tempID.contains(",")) {
+            JOptionPane.showMessageDialog(null, "Please enter valid ID", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            tempName = "";
+            tempID = "";
+        } else {
+
+            if (!studentExists()) {
+
+                String filePath = "res/trainingSet/" + Main.currentTeacher + "/" + tempName + "/";
+                File dir = new File(filePath);
+                dir.mkdir();
+                try {
+                    ImageIO.write(image, "PNG", new File(filePath + "image" + (Main.countFolders(filePath) + 1) + ".png"));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
+                nameField.setEditable(false);
+                studentIDField.setEditable(false);
+
+                JOptionPane.showMessageDialog(null, "Success! Account Created. \n" +
+                        "You may now continue adding images for training.", "Info", JOptionPane.INFORMATION_MESSAGE);
+
+            } else {
+
+                // Error message if the user already exists in the database
+
+                JOptionPane.showMessageDialog(null, "Student already exists in database. " +
+                        "Please try again...", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+
+    }
+
+    public boolean studentExists() throws FileNotFoundException {
+
+        Scanner reader = new Scanner(new File("res/studentInformation"));
+
+        while (reader.hasNextLine()) {
+            String[] line = reader.nextLine().split(",");
+            if (line[0].equals(tempName)) {
+                reader.close();
+                return true;
+            }
+        }
+        reader.close();
+        return false;
 
     }
 
     @Override
     public void modifyState() {
-
+        // Reserved method for eigenfaces
     }
 
+    /**
+     * Action listener methods
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        // This is used to change the image to make it look like a video based on triggers from the timer
         if (e.getSource() == timer) {
 
-            imageLbl.setVisible(false);
             image = webcam.getImage();
 
-            // FUNCTION: FLIP
+            imageLbl.setVisible(false);
 
-            for (int i=0;i<image.getWidth()/2;i++)
-                for (int j=0;j<image.getHeight();j++)
-                {
+            // FUNCTION: FLIP
+            for (int i = 0; i < image.getWidth() / 2; i++) {
+                for (int j = 0; j < image.getHeight(); j++) {
                     int tmp = image.getRGB(i, j);
 
-                    image.setRGB(i, j, image.getRGB(image.getWidth()-i-1, j));
-                    image.setRGB(image.getWidth()-i-1, j, tmp);
+                    image.setRGB(i, j, image.getRGB(image.getWidth() - i - 1, j));
+                    image.setRGB(image.getWidth() - i - 1, j, tmp);
 
                 }
+            }
 
-            Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
-            ImageIcon imageIcon = new ImageIcon(dimg);
+            image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight()) / 2, 0, image.getHeight(), image.getHeight());
+            image = ImageAnalysis.resize(image, imageHeight, imageWidth);
+
+            ImageIcon imageIcon = new ImageIcon(image);
             imageIcon.getImage().flush();
             imageLbl.setIcon(imageIcon);
             imageLbl.setVisible(true);
 
         }
 
+
         if (e.getSource() == register) {
 
-            if (tempName.equals("")) {
-                tempName = nameField.getText();
-            }
-            if (tempID.equals("")) {
-                tempID = studentIDField.getText();
+            try {
+                saveNewState();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
             }
 
-            if (tempName.equals("Name")) {
-                JOptionPane.showMessageDialog(null, "Please enter a name", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                tempName = "";
-                tempID = "";
-            } else if (tempID.equals("Student ID") || tempID.length() != 9) {
-                JOptionPane.showMessageDialog(null, "Please enter valid ID", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                tempName = "";
-                tempID = "";
-            } else {
-                String filePath = "res/trainingSet/" + Main.currentTeacher + "/" + tempName + "/";
-                File dir = new File(filePath);
-                dir.mkdir();
-                try {
-                    ImageIO.write(image, "PNG", new File(filePath + "image" + (Main.countFolders(filePath)+1) + ".png"));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                nameField.setEditable(false);
-                studentIDField.setEditable(false);
-            }
         }
 
         if (e.getSource() == save) {
             Main.newface.dispose();
-            System.exit(0); // TODO: REMOVE LATER
+            try {
+                Main.intermediatePage = new IntermediatePage();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            // System.exit(0); // TODO: REMOVE LATER
         }
 
     }
@@ -238,7 +346,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     @Override
     public void setTimerTime(int timerTime) {
-
+        timer.setDelay(timerTime);
     }
 
     @Override
@@ -250,7 +358,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
             timer = new Timer(delay, this);
             timer.start();
 
-            fpsCountLabel.setText("FPS: " + (int)(1000/delay));
+            fpsCountLabel.setText("FPS: " + (int) (1000 / delay));
         }
     }
 }

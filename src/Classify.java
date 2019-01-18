@@ -18,6 +18,8 @@ public class Classify {
 
     public BufferedImage image;
 
+    public BufferedImage pixelatedImage;
+
     public int headLength;
     public int headX1;
     public int headX2;
@@ -27,6 +29,11 @@ public class Classify {
     public int eyeX1;
     public int eyeX2;
     public int eyeY;
+
+    public int mouthLength;
+    public int mouthX1;
+    public int mouthX2;
+    public int mouthY;
 
     public String imageName;
 
@@ -119,19 +126,22 @@ public class Classify {
         headX2 = coords[1];
         headY = coords[2] + Classifiers.pixelAccuracy;
 
-        // String filePath = "res/trainingSet/teacher1/learner1/";
-        // ImageIO.write(getImage() , "PNG", new File(filePath + "Ximage1.png"));
-
         // assignEyesHaar();
-        generatePixelatedHead();
+        assignEyebrowsHaar();
 
     }
 
-    public void generatePixelatedHead() throws IOException {
+    public void assignEyebrowsHaar() throws IOException {
+
+        // These ratios were calculated from tweaking parameters based on dataset images from approximately 50 images
+
+//        BufferedImage imageBackup = image;
+//        image = ImageAnalysis.furtherModifcationClassification(image);
 
         eyeLength = headLength/3;
+        int eyeLengthY = eyeLength/5;
 
-        BufferedImage pixelatedImage = new BufferedImage(image.getWidth()/eyeLength, image.getHeight()/eyeLength, BufferedImage.TYPE_INT_RGB);
+        pixelatedImage = new BufferedImage(image.getWidth()/eyeLength, image.getHeight()/eyeLengthY, BufferedImage.TYPE_INT_RGB);
 
         for (int y = 0; y < pixelatedImage.getHeight(); y++) {
             for (int x = 0; x < pixelatedImage.getWidth(); x++) {
@@ -140,53 +150,61 @@ public class Classify {
                 int RGBSumGreen = 0;
                 int RGBSumBlue = 0;
 
-                for (int j = 0; j < eyeLength; j++) {
+                for (int j = 0; j < eyeLengthY; j++) {
                     for (int i = 0; i < eyeLength; i++) {
-                        int RGB = image.getRGB(x*eyeLength + i, y*eyeLength + j);
+                        int RGB = image.getRGB(x*eyeLength + i, y*eyeLengthY + j);
                         RGBSumRed+=(RGB >> 16) & 0xFF;
                         RGBSumGreen+=(RGB >> 8) & 0xFF;
                         RGBSumGreen+=(RGB & 0xFF);
                     }
                 }
 
-                int RGB = ImageAnalysis.RGBGenerator((int)(RGBSumRed/Math.pow(eyeLength, 2)),
-                        (int)(RGBSumGreen/Math.pow(eyeLength, 2)),
-                        (int)(RGBSumBlue/Math.pow(eyeLength, 2)));
-                
+                int RGB = ImageAnalysis.RGBGenerator((int)(RGBSumRed/(eyeLength * eyeLengthY)),
+                        (int)(RGBSumGreen/(eyeLength * eyeLengthY)),
+                        (int)(RGBSumBlue/(eyeLength * eyeLengthY)));
+
                 pixelatedImage.setRGB(x, y, RGB);
 
             }
         }
 
+        // Store max intensities to store the rest of the values in if they are darker than the RGB values defined
+        // Enabling storing the darkest spots on the image, for the eyebrows
         int[] zoneIntensities = new int[2];
         zoneIntensities[0] = 100000;
         zoneIntensities[1] = 100000;
 
-        System.out.println(headX2/eyeLength + " " + pixelatedImage.getWidth());
+        // System.out.println(headX2/eyeLength + " " + pixelatedImage.getWidth());
 
-        for (int y = headY/eyeLength; y < pixelatedImage.getHeight()/2+1; y++) {
+        for (int y = headY/eyeLengthY; y < pixelatedImage.getHeight()/2+1; y++) {
             for (int x = 0; x < headX2/eyeLength; x++) {
+
                 int zone1 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x, y));
                 int zone2 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x+1, y));
                 int zone3 = ImageAnalysis.comprehensiveRGB(pixelatedImage.getRGB(x+2, y));
+
+                System.out.println(zone1 + " " + zone2 + " " + zone3);
 
                 if (Math.abs(zone1 - zone3) < 10 && zone1 < zone2 && zone3 < zone2 &&
 
                         ((zone2 - zone1 < zoneIntensities[0] && zone2 - zone3 < zoneIntensities[1]) ||
                                 (zone2 - zone3 < zoneIntensities[0] && zone2 - zone1 < zoneIntensities[1]))) {
 
-                    System.out.println(zone1 + " " + zone2 + " " + zone3);
+                    // System.out.println(zone1 + " " + zone2 + " " + zone3);
+                    System.out.println("Thats a three pointer!");
 
                     zoneIntensities[0] = zone1;
                     zoneIntensities[1] = zone3;
 
                     eyeX1 = x * eyeLength;
                     eyeX2 = eyeX1 + eyeLength;
-                    eyeY = y * eyeLength;
+                    eyeY = y * eyeLengthY - eyeLengthY;
 
                 }
             }
         }
+
+        // image = imageBackup;
 
         Graphics2D g = (Graphics2D) getImage().getGraphics();
         g.setColor(Color.RED);
@@ -194,8 +212,10 @@ public class Classify {
         g.drawLine(eyeX1, eyeY, eyeX2, eyeY);
         g.drawLine(eyeX1 + eyeLength*2, eyeY, eyeX2 + eyeLength*2, eyeY);
 
-        String filePath = "res/trainingSet/teacher1/learner2/";
-        ImageIO.write(image , "PNG", new File(filePath + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
+        String filePath = "res/trainingSet/teacher1/learner2/todelete/";
+        ImageIO.write(pixelatedImage , "PNG", new File(filePath + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
+        String filePath2 = "res/trainingSet/teacher1/learner2/todelete2/";
+        ImageIO.write(image , "PNG", new File(filePath2 + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
 
         if (zoneIntensities[0] == 100000 && zoneIntensities[1] == 100000) {
             System.out.println("not a face");
@@ -277,6 +297,72 @@ public class Classify {
 
         String filePath = "res/trainingSet/teacher1/learner2/";
         ImageIO.write(getImage() , "PNG", new File(filePath + "X"+ imageName +".png"));
+
+    }
+
+    public void assignMouthHaar() throws IOException {
+
+        int top_length = 0;
+        int[] coords = new int[3];
+
+        for (int y = 0; y < image.getHeight()/Classifiers.pixelAccuracy-1; y++) {
+            for (int x = 0; x < image.getWidth()/Classifiers.pixelAccuracy-1; x++) {
+
+                int currentLength = 0;
+
+                while (true) {
+
+                    // Checks for total area score
+                    int sector1Score = 0;
+                    int sector2Score = 0;
+
+                    for (int j = 0; j < Classifiers.pixelAccuracy; j++) {
+                        for (int i = 0; i < Classifiers.pixelAccuracy; i++) {
+                            if ((x + currentLength) * Classifiers.pixelAccuracy + i >= image.getWidth()) {
+                                break;
+                            }
+                            sector1Score += ImageAnalysis.comprehensiveRGB(
+                                    image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
+                                            y * Classifiers.pixelAccuracy + j));
+                            sector2Score += ImageAnalysis.comprehensiveRGB(
+                                    image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
+                                            y * Classifiers.pixelAccuracy + j + Classifiers.pixelAccuracy));
+                        }
+                    }
+
+                    currentLength++;
+
+                    // NOTE: higher score means lighter color
+
+                    if (sector2Score - sector1Score > 10000) {
+                        continue;
+                    } else {
+                        if (currentLength > top_length) {
+                            top_length = currentLength;
+                            coords[0] = x * Classifiers.pixelAccuracy;
+                            coords[1] = (x + currentLength) * Classifiers.pixelAccuracy;
+                            coords[2] = y * Classifiers.pixelAccuracy;
+                            currentLength = 0;
+                        }
+                        break;
+                    }
+                }
+
+            }
+        }
+
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
+
+        mouthLength = Math.abs(coords[1] - coords[0]);
+        mouthX1 = coords[0];
+        mouthX2 = coords[1];
+        mouthY = coords[2] + Classifiers.pixelAccuracy;
+
+        // assignEyesHaar();
+        assignEyebrowsHaar();
 
     }
 

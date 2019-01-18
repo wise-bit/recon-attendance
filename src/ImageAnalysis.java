@@ -12,8 +12,8 @@ public class ImageAnalysis {
 
     // This main is to be deleted later
 
-    public static final int BLACK = RGBGenerator(0,0,0);
-    public static final int WHITE = RGBGenerator(255,255,255);
+    public static final int BLACK = RGBGenerator(0, 0, 0);
+    public static final int WHITE = RGBGenerator(255, 255, 255);
     public static final int sensitivity = -1000000;
     public static final int landmarkSize = 5;
     public static final int segmentation = 200;
@@ -21,7 +21,35 @@ public class ImageAnalysis {
     public static void main(String[] args) throws IOException {
         BufferedImage img = ImageIO.read(new File("res/pureTestSets/face1.png"));
         String filePath = "res/pureTestSets/";
-        ImageIO.write( trainingReady(img) , "PNG", new File(filePath + "modifiedImage1.png"));
+        ImageIO.write(trainingReady(img), "PNG", new File(filePath + "modifiedImage1.png"));
+    }
+
+
+    public static BufferedImage furtherModifcation(BufferedImage img) {
+        img = trainingReady(img);
+
+        BufferedImage boldedImage = bold(img);
+        // Creates a glitched image to enhance features of face
+        BufferedImage glitchedImage = createGlitch(boldedImage);
+        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
+
+        BufferedImage enhancedImage = enhanceGlitch(glitchedImage);
+
+        return enhancedImage;
+    }
+
+    public static BufferedImage furtherModifcationClassification(BufferedImage img) {
+
+        BufferedImage boldedImage = bold(img);
+
+        // Creates a glitched image to enhance features of face
+        BufferedImage glitchedImage = createGlitch(boldedImage);
+
+        BufferedImage resizedAgain = resize(glitchedImage, 200, 200);
+
+        BufferedImage enhancedImage = enhanceGlitch(resizedAgain);
+
+        return enhancedImage;
     }
 
     // Prepares image to be stored for training for the facial recognition
@@ -30,26 +58,18 @@ public class ImageAnalysis {
         BufferedImage croppedImage;
         // Crops image based on orientation
         if (image.getHeight() <= image.getWidth())
-            croppedImage = cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
+            croppedImage = cropImage(image, (image.getWidth() - image.getHeight()) / 2, 0, image.getHeight(), image.getHeight());
         else
-            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth())/2, image.getWidth(), image.getWidth());
+            croppedImage = cropImage(image, 0, (image.getHeight() - image.getWidth()) / 2, image.getWidth(), image.getWidth());
 
         // Greyscales image for analysis purposes
         BufferedImage greyScaledImage = toGreyScalePixelInefficient(croppedImage);
 
         // uses the ratio of 450
-        // BufferedImage resizedImage = resize( greyScaledImage , 100, 129);
-        BufferedImage resizedImage = resize( greyScaledImage , 200, 200);
+        BufferedImage resizedImage = resize(greyScaledImage, 200, 200);
 
-        // BufferedImage boldedImage = bold(resizedImage);
-        // Creates a glitched image to enhance features of face
-//        BufferedImage glitchedImage = createGlitch(resizedImage);
-//        BufferedImage landmarkedImage = visualLandmarkAssignment(glitchedImage);
-
-        // TODO: Change this line
-        // return resizedImage;
+        // returns the new image
         return resizedImage;
-        // return (resizedImage, (resizedImage.getWidth() - resizedImage.getHeight())/2, 0, resizedImage.getHeight(), resizedImage.getHeight());
 
     }
 
@@ -92,7 +112,7 @@ public class ImageAnalysis {
     }
 
     // Resize an image using given dimensions
-    public static BufferedImage resize (BufferedImage img, int height, int width) {
+    public static BufferedImage resize(BufferedImage img, int height, int width) {
         Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         // Image tmp = img.getScaledInstance(width, height, Image.SCALE_FAST);
         BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -103,7 +123,7 @@ public class ImageAnalysis {
     }
 
     // Bolds the image by using only white and black
-    public static BufferedImage bold (BufferedImage image) {
+    public static BufferedImage bold(BufferedImage image) {
 
         BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
 
@@ -132,7 +152,7 @@ public class ImageAnalysis {
 
     // Flips the image over the X axis
     public static BufferedImage flipImageX(BufferedImage image) {
-        for (int i=0;i<image.getWidth()/2;i++) {
+        for (int i = 0; i < image.getWidth() / 2; i++) {
             for (int j = 0; j < image.getHeight(); j++) {
                 int tmp = image.getRGB(i, j);
 
@@ -145,33 +165,60 @@ public class ImageAnalysis {
     }
 
     // Creates glitch style image for future comparison
-    public static BufferedImage createGlitch (BufferedImage image) {
+    public static BufferedImage createGlitch(BufferedImage image) {
 
-        BufferedImage newImage = new BufferedImage(image.getWidth()*3, image.getHeight()*3, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage = new BufferedImage(image.getWidth() * 3, image.getHeight() * 3, BufferedImage.TYPE_INT_RGB);
 
-        for (int i = 1; i < image.getWidth()-1; i++) {
-            for (int j = 1; j < image.getHeight()-1; j++) {
+        for (int i = 1; i < image.getWidth() - 1; i++) {
+            for (int j = 1; j < image.getHeight() - 1; j++) {
 
                 // These are the default values in case the differences are the same
                 int maxDiff = sensitivity;
                 int posOfPix = 4;
 
-                if (image.getRGB(i-1, j-1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i-1, j-1) - image.getRGB(i, j); posOfPix = 0; }
-                if (image.getRGB(i, j-1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i, j-1) - image.getRGB(i, j); posOfPix = 1; }
-                if (image.getRGB(i+1, j-1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i+1, j-1) - image.getRGB(i, j); posOfPix = 2; }
+                if (image.getRGB(i - 1, j - 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i - 1, j - 1) - image.getRGB(i, j);
+                    posOfPix = 0;
+                }
+                if (image.getRGB(i, j - 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i, j - 1) - image.getRGB(i, j);
+                    posOfPix = 1;
+                }
+                if (image.getRGB(i + 1, j - 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i + 1, j - 1) - image.getRGB(i, j);
+                    posOfPix = 2;
+                }
 
-                if (image.getRGB(i-1, j) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i-1, j) - image.getRGB(i, j); posOfPix = 3; }
-                if (image.getRGB(i, j) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i, j) - image.getRGB(i, j); posOfPix = 4; }
-                if (image.getRGB(i+1, j) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i+1, j) - image.getRGB(i, j); posOfPix = 5; }
+                if (image.getRGB(i - 1, j) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i - 1, j) - image.getRGB(i, j);
+                    posOfPix = 3;
+                }
+                if (image.getRGB(i, j) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i, j) - image.getRGB(i, j);
+                    posOfPix = 4;
+                }
+                if (image.getRGB(i + 1, j) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i + 1, j) - image.getRGB(i, j);
+                    posOfPix = 5;
+                }
 
-                if (image.getRGB(i-1, j+1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i-1, j+1) - image.getRGB(i, j); posOfPix = 6; }
-                if (image.getRGB(i, j+1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i, j+1) - image.getRGB(i, j); posOfPix = 7; }
-                if (image.getRGB(i+1, j+1) - image.getRGB(i, j) < maxDiff) { maxDiff = image.getRGB(i+1, j+1) - image.getRGB(i, j); posOfPix = 8; }
+                if (image.getRGB(i - 1, j + 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i - 1, j + 1) - image.getRGB(i, j);
+                    posOfPix = 6;
+                }
+                if (image.getRGB(i, j + 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i, j + 1) - image.getRGB(i, j);
+                    posOfPix = 7;
+                }
+                if (image.getRGB(i + 1, j + 1) - image.getRGB(i, j) < maxDiff) {
+                    maxDiff = image.getRGB(i + 1, j + 1) - image.getRGB(i, j);
+                    posOfPix = 8;
+                }
 
-                for (int x = 0; x < 3 ; x++) {
+                for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         try {
-                            newImage.setRGB(i * 3 + x, j * 3 + y, BLACK);
+                            newImage.setRGB(i * 3 + x, j * 3 + y, WHITE);
                         } catch (Exception e) {
                             System.out.println(i * 3 + j + " " + j * 3 + y);
                         }
@@ -179,7 +226,7 @@ public class ImageAnalysis {
                 }
 
                 if (posOfPix != 4) {
-                    newImage.setRGB(i * 3 + posOfPix % 3, j * 3 + posOfPix / 3, WHITE);
+                    newImage.setRGB(i * 3 + posOfPix % 3, j * 3 + posOfPix / 3, BLACK);
                 }
 
             }
@@ -189,13 +236,38 @@ public class ImageAnalysis {
 
     }
 
+    public static BufferedImage enhanceGlitch(BufferedImage image) {
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+        
+        for (int y = 0; y < newImage.getHeight(); y++) {
+            for (int x = 0; x < newImage.getWidth(); x++) {
+                newImage.setRGB(x, y, RGBGenerator(0,0,0));
+            }
+        }
+
+        for (int y = 2; y < image.getHeight(); y++) {
+            for (int x = 2; x < image.getWidth(); x++) {
+                if (comprehensiveRGB(image.getRGB(x, y)) == 0){
+                    Graphics2D g = (Graphics2D) newImage.getGraphics();
+                    g.setColor(Color.YELLOW);
+                    g.setStroke(new BasicStroke(5));
+
+                    int newLandmarkDiameter = 10;
+                    g.fillOval(x, y, newLandmarkDiameter, newLandmarkDiameter);
+                }
+            }
+        }
+
+        return newImage;
+    }
+
     // Crop an image, courtesy of bufferedImage
-    public static BufferedImage cropImage(BufferedImage originalImage, int x, int y, int w, int h){
+    public static BufferedImage cropImage(BufferedImage originalImage, int x, int y, int w, int h) {
         BufferedImage subImgage = originalImage.getSubimage(x, y, w, h);
         return subImgage;
     }
 
-    public static BufferedImage mask (BufferedImage image, int x, int y, int length, int width) // boolean?
+    public static BufferedImage mask(BufferedImage image, int x, int y, int length, int width) // boolean?
     {
         BufferedImage imageCopy = new BufferedImage(length, width, BufferedImage.TYPE_INT_RGB);
 
@@ -205,7 +277,7 @@ public class ImageAnalysis {
 
     }
 
-    public static BufferedImage visualLandmarkAssignment (BufferedImage image) {
+    public static BufferedImage visualLandmarkAssignment(BufferedImage image) {
 
         // BufferedImage imageCopy = image;
         BufferedImage imageCopy = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -225,26 +297,26 @@ public class ImageAnalysis {
 
                 for (int i = 0; i < segmentLength; i++) {
                     for (int j = 0; j < segmentLength; j++) {
-                        RGBSum += comprehensiveRGB(image.getRGB(x*segmentLength + j, y*segmentLength + i));
+                        RGBSum += comprehensiveRGB(image.getRGB(x * segmentLength + j, y * segmentLength + i));
                     }
                 }
 
-                 if (RGBSum > distingushingThreshold) {
+                if (RGBSum > distingushingThreshold) {
 
-                     // FUNCTION: ADD LANDMARK
+                    // FUNCTION: ADD LANDMARK
 
-                     int pointX = segmentLength*x + segmentLength/2;
-                     int pointY = segmentLength*y + segmentLength/2;
+                    int pointX = segmentLength * x + segmentLength / 2;
+                    int pointY = segmentLength * y + segmentLength / 2;
 
-                     // image.setRGB(pointX, pointY, RGBGenerator(255, 0, 0));
-                     Graphics2D g = (Graphics2D) imageCopy.getGraphics();
-                     g.setColor(Color.RED);
-                     g.setStroke(new BasicStroke(5));
+                    // image.setRGB(pointX, pointY, RGBGenerator(255, 0, 0));
+                    Graphics2D g = (Graphics2D) imageCopy.getGraphics();
+                    g.setColor(Color.RED);
+                    g.setStroke(new BasicStroke(5));
 
-                     g.fillOval(segmentLength*x + segmentLength/2, segmentLength*y + segmentLength/2, landmarkSize, landmarkSize);
-                     // TODO: Store these points somewhere
-                     // System.out.println(segmentLength*x + segmentLength/2 + ":" + (segmentLength*y + segmentLength/2) + " --> " + RGBSum);
-                 }
+                    g.fillOval(segmentLength * x + segmentLength / 2, segmentLength * y + segmentLength / 2, landmarkSize, landmarkSize);
+                    // TODO: Store these points somewhere
+                    // System.out.println(segmentLength*x + segmentLength/2 + ":" + (segmentLength*y + segmentLength/2) + " --> " + RGBSum);
+                }
 
 
             }
@@ -254,7 +326,7 @@ public class ImageAnalysis {
 
     }
 
-    public static void printReverseRGB (int RGB) {
+    public static void printReverseRGB(int RGB) {
         int red = (RGB >> 16) & 0xFF;
         int green = (RGB >> 8) & 0xFF;
         int blue = (RGB & 0xFF);
@@ -266,24 +338,6 @@ public class ImageAnalysis {
         int green = (RGB >> 8) & 0xFF;
         int blue = (RGB & 0xFF);
         return red + green + blue;
-    }
-
-    // Kept in case of cloud storage requirements (not implemented in actual program)
-    public static void downloadOnlineImage(String websiteURL, String filename, String outputPath) {
-        try{
-            URL url = new URL(websiteURL);
-            InputStream inputStream = url.openStream();
-            OutputStream outputStream = new FileOutputStream(outputPath + "/" + filename);
-            byte[] buffer = new byte[2048];
-            int length = 0;
-            while ((length = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, length);
-            }
-            inputStream.close();
-            outputStream.close();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
     }
 
 }
