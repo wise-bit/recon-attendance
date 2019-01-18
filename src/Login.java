@@ -229,7 +229,12 @@ public class Login extends JFrame implements ActionListener {
                         new File("res/attendanceData/" + usernameBox.getText()).mkdir();
 
                         // Makes a new file in the student information folder to keep track of a student's name and studentID
-                        new File("res/studentInformation/" + Main.currentTeacher + ".txt").createNewFile();
+                        new File("res/studentInformation/" + usernameBox.getText() + ".txt").createNewFile();
+
+
+                        // Makes new directory to store face data of students
+                        new File("res/studentFaceData/" + usernameBox.getText() + ".txt").mkdir();
+
                         Main.login.dispose();
                         Main.init();
                         Main.login = new Login();

@@ -1,3 +1,7 @@
+/**
+ * This class is not part of the application, but is used to test training data
+ */
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -5,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class Classify {
+public class ClassifyTest {
 
     /*
 
@@ -37,9 +41,11 @@ public class Classify {
 
     public String imageName;
 
-    public Classify(BufferedImage img) throws IOException {
+    public ClassifyTest(BufferedImage img, String name) throws IOException {
 
         setImage(img);
+        setImageName(name);
+
         assignHeadHaar();
 
     }
@@ -86,10 +92,10 @@ public class Classify {
                             }
                             sector1Score += ImageAnalysis.comprehensiveRGB(
                                     image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
-                                    y * Classifiers.pixelAccuracy + j));
+                                            y * Classifiers.pixelAccuracy + j));
                             sector2Score += ImageAnalysis.comprehensiveRGB(
                                     image.getRGB((x + currentLength) * Classifiers.pixelAccuracy + i,
-                                    y * Classifiers.pixelAccuracy + j + Classifiers.pixelAccuracy));
+                                            y * Classifiers.pixelAccuracy + j + Classifiers.pixelAccuracy));
                         }
                     }
 
@@ -113,6 +119,12 @@ public class Classify {
 
             }
         }
+
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
+
         headLength = Math.abs(coords[1] - coords[0]);
         headX1 = coords[0];
         headX2 = coords[1];
@@ -198,6 +210,17 @@ public class Classify {
 
         // image = imageBackup;
 
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(eyeX1, eyeY, eyeX2, eyeY);
+        g.drawLine(eyeX1 + eyeLength*2, eyeY, eyeX2 + eyeLength*2, eyeY);
+
+        String filePath = "res/trainingSet/teacher1/learner2/todelete/";
+        ImageIO.write(pixelatedImage , "PNG", new File(filePath + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
+        String filePath2 = "res/trainingSet/teacher1/learner2/todelete2/";
+        ImageIO.write(image , "PNG", new File(filePath2 + "X" + imageName.substring(0, imageName.length()-4) + ".png"));
+
         if (zoneIntensities[0] == 100000 && zoneIntensities[1] == 100000) {
             System.out.println("not a face");
         }
@@ -268,6 +291,17 @@ public class Classify {
 
         System.out.println("\n" + top_length + ", which is, " + Arrays.toString(coords) + ". Difference: " + difference);
 
+        System.out.println(eyeLength);
+
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
+        g.drawLine(coords[0] + eyeLength*2, coords[2], coords[1] + eyeLength*2, coords[2]);
+
+        String filePath = "res/trainingSet/teacher1/learner2/";
+        ImageIO.write(getImage() , "PNG", new File(filePath + "X"+ imageName +".png"));
+
     }
 
     public void assignMouthHaar() throws IOException {
@@ -320,6 +354,11 @@ public class Classify {
 
             }
         }
+
+        Graphics2D g = (Graphics2D) getImage().getGraphics();
+        g.setColor(Color.RED);
+        g.setStroke(new BasicStroke(5));
+        g.drawLine(coords[0], coords[2], coords[1], coords[2]);
 
         mouthLength = Math.abs(coords[1] - coords[0]);
         mouthX1 = coords[0];

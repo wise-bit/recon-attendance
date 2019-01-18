@@ -13,7 +13,9 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Scanner;
 
 public class NewFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
@@ -37,6 +39,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     JButton register = new JButton("Take Snapshot");
     JButton save = new JButton("Save");
+    JButton manualEntry = new JButton(("Manual Entry"));
 
     JLabel fpsCountLabel;
     JSlider slider;
@@ -175,6 +178,14 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         save.setBorderPainted(false);
         buttons.add(save);
 
+        buttons.add(Box.createRigidArea(new Dimension(50,0)));
+
+        manualEntry.addActionListener(this);
+        manualEntry.setBackground(Color.WHITE);
+        manualEntry.setForeground(Color.BLACK);
+        manualEntry.setBorderPainted(false);
+        buttons.add(manualEntry);
+
         buttons.add(register);
         buttons.add(save);
 
@@ -209,7 +220,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
     }
 
     @Override
-    public void saveNewState() throws FileNotFoundException {
+    public void saveNewState() throws IOException {
 
         if (tempName.equals("")) {
             tempName = nameField.getText();
@@ -231,14 +242,51 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
             if (!studentExists()) {
 
-                String filePath = "res/trainingSet/" + Main.currentTeacher + "/" + tempName + "/";
-                File dir = new File(filePath);
-                dir.mkdir();
-                try {
-                    ImageIO.write(image, "PNG", new File(filePath + "image" + (Main.countFolders(filePath) + 1) + ".png"));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                String filePathForFaceData = "res/studentFaceData/" + Main.currentTeacher + "/" + tempName + ".txt";
+                String filePathForInformation = "res/studentInformation/" + Main.currentTeacher + ".txt";
+
+                File faceDir = new File(filePathForFaceData);
+                faceDir.createNewFile();
+
+                // This keeps track of the last line
+
+                Classify c = new Classify(image);
+
+                ////
+
+                int prevHeadtoEye = 0;
+                int prevEyetoMouth = 0;
+                int prevHeadtoMouth = 0;
+                int prevheadMouthRatio = 0;
+
+
+                String data = "";
+
+                Scanner readOldFaceData = new Scanner(filePathForFaceData);
+
+                if (readOldFaceData.hasNextLine()) {
+
+                    // Averaging with old data, with old data prioritized slightly more in order to prevent drastic changes to data
+
+                    String[] line = readOldFaceData.nextLine().split(",");
+                    // TODO: Make a decent ratio
+
+                } else {
+
+                    prevHeadtoEye = c.headY - c.eyeY;
+                    // TODO: Continue here
+                    // And so on
+
                 }
+
+                byte[] bytes = data.getBytes();
+                FileOutputStream stream = new FileOutputStream(filePathForFaceData, false);
+                stream.write(bytes);
+                stream.close();
+
+                ////
+
+
                 // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
                 nameField.setEditable(false);
                 studentIDField.setEditable(false);
@@ -259,7 +307,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     public boolean studentExists() throws FileNotFoundException {
 
-        Scanner reader = new Scanner(new File("res/studentInformation"));
+        Scanner reader = new Scanner(new File("res/studentInformation/" + Main.currentTeacher + ".txt"));
 
         while (reader.hasNextLine()) {
             String[] line = reader.nextLine().split(",");
@@ -318,7 +366,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
             try {
                 saveNewState();
-            } catch (FileNotFoundException e1) {
+            } catch (IOException e1) {
                 e1.printStackTrace();
             }
 

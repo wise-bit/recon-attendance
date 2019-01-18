@@ -69,6 +69,7 @@ public class Main {
     public static Classify classify;
     public static IntermediatePage intermediatePage;
     public static AddClass addClass;
+    public static ManualEntry manualEntry;
 
     public static String currentTeacher  = "crashProof";
     public static String currentPassword  = "crashProof";

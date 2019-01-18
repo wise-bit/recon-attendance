@@ -53,7 +53,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         addNewFace.setFont(new Font("Verdana", Font.BOLD, 18));
         addNewFace.setBorder(blackBorder);
-        addNewFace.setBounds(150, 100, 200, 30);
+        addNewFace.setBounds(150, 100, 300, 30);
         addNewFace.setBackground(Color.WHITE);
         addNewFace.setForeground(Color.BLACK);
         addNewFace.addActionListener(this);
@@ -71,7 +71,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         moreTraining.setFont(new Font("Verdana", Font.BOLD, 18));
         moreTraining.setBorder(blackBorder);
-        moreTraining.setBounds(150, 150, 200, 30);
+        moreTraining.setBounds(150, 150, 300, 30);
         moreTraining.setBackground(Color.WHITE);
         moreTraining.setForeground(Color.BLACK);
         moreTraining.addActionListener(this);
@@ -89,7 +89,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         viewClass.setFont(new Font("Verdana", Font.BOLD, 18));
         viewClass.setBorder(blackBorder);
-        viewClass.setBounds(150, 200, 200, 30);
+        viewClass.setBounds(150, 200, 300, 30);
         viewClass.setBackground(Color.WHITE);
         viewClass.setForeground(Color.BLACK);
         viewClass.addActionListener(this);
@@ -107,7 +107,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         attendanceHistory.setFont(new Font("Verdana", Font.BOLD, 18));
         attendanceHistory.setBorder(blackBorder);
-        attendanceHistory.setBounds(150, 250, 200, 30);
+        attendanceHistory.setBounds(150, 250, 300, 30);
         attendanceHistory.setBackground(Color.WHITE);
         attendanceHistory.setForeground(Color.BLACK);
         attendanceHistory.addActionListener(this);
@@ -125,7 +125,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         
         attendanceTime.setFont(new Font("Verdana", Font.BOLD, 18));
         attendanceTime.setBorder(blackBorder);
-        attendanceTime.setBounds(150, 250, 200, 30);
+        attendanceTime.setBounds(150, 250, 300, 30);
         attendanceTime.setBackground(Color.WHITE);
         attendanceTime.setForeground(Color.BLACK);
         attendanceTime.addActionListener(this);
@@ -143,7 +143,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         
         addClass.setFont(new Font("Verdana", Font.BOLD, 18));
         addClass.setBorder(blackBorder);
-        addClass.setBounds(150, 300, 200, 30);
+        addClass.setBounds(150, 300, 300, 30);
         addClass.setBackground(Color.WHITE);
         addClass.setForeground(Color.BLACK);
         addClass.addActionListener(this);
