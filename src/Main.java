@@ -68,10 +68,11 @@ public class Main {
     public static StudentList studentlist;
     public static Classify classify;
     public static IntermediatePage intermediatePage;
+    public static AddClass addClass;
 
-    public static String currentTeacher = "";
-    public static String currentPassword = "";
-    public static String currentClass = "";
+    public static String currentTeacher  = "crashProof";
+    public static String currentPassword  = "crashProof";
+    public static String currentClass  = "crashProof";
 
     public static ArrayList<Classroom> allClasses;
     public static ArrayList<Teacher> teacherAccounts;

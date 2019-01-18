@@ -175,9 +175,6 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         save.setBorderPainted(false);
         buttons.add(save);
 
-        register.addActionListener(this);
-        save.addActionListener(this);
-
         buttons.add(register);
         buttons.add(save);
 
