@@ -57,6 +57,12 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 import java.awt.GraphicsEnvironment;
 
+/**
+ * Main class of the program, which initializes all of the elements, and then calls the login screen.
+ *
+ * This class also contains important methods used throughout the project such as the method to count the lines of a
+ *      program or the method to count the number of folders in another folder.
+ */
 public class Main {
 
     public static Login login;
@@ -71,6 +77,9 @@ public class Main {
     public static AddClass addClass;
     public static ManualEntry manualEntry;
 
+    public static ClassifyTest classifyTest;
+
+    // Default strings assigned to prevent any form of NullPointerException
     public static String currentTeacher  = "crashProof";
     public static String currentPassword  = "crashProof";
     public static String currentClass  = "crashProof";
@@ -89,13 +98,13 @@ public class Main {
 
         // listFonts();
 
+        // Testing purposes
+        //trainTestDataset();
+
         login = new Login();
 
         // training = new TrainFace(); // move this to login sreen
         // newface = new NewFace();
-
-        // Testing purposes
-        // trainTestDataset();
 
     }
 
@@ -242,10 +251,10 @@ public class Main {
         for (String image : imagesToCheck) {
             BufferedImage img = ImageIO.read(new File("res/trainingSet/teacher1/learner2/" + image));
 
-//            String filePath = "res/trainingSet/teacher1/learner2/glitchartstorage/";
-//            ImageIO.write(ImageAnalysis.furtherModifcation(img), "PNG", new File(filePath + "X" + image.substring(0, image.length()-4) + ".png"));
+            String filePath = "res/trainingSet/teacher1/learner2/glitchartstorage/";
+            ImageIO.write(ImageAnalysis.furtherModifcation(img), "PNG", new File(filePath + "X" + image.substring(0, image.length()-4) + ".png"));
 
-            classify = new Classify(ImageAnalysis.trainingReady(img), image);
+            classifyTest = new ClassifyTest(ImageAnalysis.trainingReady(img), image);
         }
     }
 

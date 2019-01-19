@@ -257,27 +257,39 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
                 int prevHeadtoEye = 0;
                 int prevEyetoMouth = 0;
                 int prevHeadtoMouth = 0;
-                int prevheadMouthRatio = 0;
+                int prevHeadMouthRatio = 0;
 
+                int headtoEye = c.eyeY - c.headY;
+                int eyetoMouth = c.mouthY - c.eyeY;
+                int headtoMouth = c.mouthY - c.headY;
+                int headMouthRatio = (int)(Math.abs(c.headX2 - c.headX1)/Math.abs(c.mouthX1 - c.mouthX2));
 
                 String data = "";
-
                 Scanner readOldFaceData = new Scanner(filePathForFaceData);
 
-                if (readOldFaceData.hasNextLine()) {
+                if (Main.countLines(filePathForFaceData) > 0) {
 
                     // Averaging with old data, with old data prioritized slightly more in order to prevent drastic changes to data
 
                     String[] line = readOldFaceData.nextLine().split(",");
-                    // TODO: Make a decent ratio
 
-                } else {
+                    prevHeadtoEye = Integer.parseInt(line[0]);
+                    prevEyetoMouth = Integer.parseInt(line[1]);
+                    prevHeadtoMouth = Integer.parseInt(line[2]);
+                    prevHeadMouthRatio = Integer.parseInt(line[0]);
 
-                    prevHeadtoEye = c.headY - c.eyeY;
-                    // TODO: Continue here
-                    // And so on
+                    // A ratio which reasonably doesn't change too much
+
+                    double changeRatio = 0.2;
+
+                    headtoEye = (int) (headtoEye*changeRatio + prevHeadtoEye*(1-changeRatio));
+                    eyetoMouth = (int) (eyetoMouth*changeRatio + prevEyetoMouth*(1-changeRatio));
+                    headtoMouth = (int) (headtoMouth*changeRatio + prevHeadtoMouth*(1-changeRatio));
+                    headMouthRatio = (int) (headMouthRatio*changeRatio + prevHeadMouthRatio*(1-changeRatio));
 
                 }
+
+                data = String.format("%d,%d,%d,%d", headtoEye, eyetoMouth, headtoMouth, headMouthRatio);
 
                 byte[] bytes = data.getBytes();
                 FileOutputStream stream = new FileOutputStream(filePathForFaceData, false);
@@ -286,13 +298,15 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
                 ////
 
+                // Only allows this to show up the first time
+                if (nameField.isEditable()) {
+                    JOptionPane.showMessageDialog(null, "Success! Account Created. \n" +
+                            "You may now continue adding images for training.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }
 
                 // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
                 nameField.setEditable(false);
                 studentIDField.setEditable(false);
-
-                JOptionPane.showMessageDialog(null, "Success! Account Created. \n" +
-                        "You may now continue adding images for training.", "Info", JOptionPane.INFORMATION_MESSAGE);
 
             } else {
 

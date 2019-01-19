@@ -45,11 +45,11 @@ public class ImageAnalysis {
         // Creates a glitched image to enhance features of face
         BufferedImage glitchedImage = createGlitch(boldedImage);
 
-        BufferedImage resizedAgain = resize(glitchedImage, 200, 200);
+        BufferedImage enhancedImage = enhanceGlitch(glitchedImage);
 
-        BufferedImage enhancedImage = enhanceGlitch(resizedAgain);
+        BufferedImage resizedAgain = resize(enhancedImage, 200, 200);
 
-        return enhancedImage;
+        return resizedAgain;
     }
 
     // Prepares image to be stored for training for the facial recognition
@@ -241,15 +241,15 @@ public class ImageAnalysis {
         
         for (int y = 0; y < newImage.getHeight(); y++) {
             for (int x = 0; x < newImage.getWidth(); x++) {
-                newImage.setRGB(x, y, RGBGenerator(0,0,0));
+                newImage.setRGB(x, y, WHITE);
             }
         }
 
-        for (int y = 2; y < image.getHeight(); y++) {
-            for (int x = 2; x < image.getWidth(); x++) {
+        for (int y = 10; y < image.getHeight(); y++) {
+            for (int x = 10; x < image.getWidth(); x++) {
                 if (comprehensiveRGB(image.getRGB(x, y)) == 0){
                     Graphics2D g = (Graphics2D) newImage.getGraphics();
-                    g.setColor(Color.YELLOW);
+                    g.setColor(Color.BLACK);
                     g.setStroke(new BasicStroke(5));
 
                     int newLandmarkDiameter = 10;
@@ -286,7 +286,7 @@ public class ImageAnalysis {
         int distingushingThreshold = 0;
 
         int segmentLength = image.getHeight() / segmentCount;
-        System.out.println(segmentLength);
+        // System.out.println(segmentLength);
 
         ArrayList<Point> pointsPlaced = new ArrayList<Point>();
 

@@ -186,7 +186,10 @@ public class IntermediatePage extends JFrame implements ActionListener {
             }
         });
         add(logout);
-        
+
+        String current = classChooser.getSelectedItem().toString();
+        Main.currentClass = current;
+
         setVisible(true);
 
     }
@@ -204,47 +207,47 @@ public class IntermediatePage extends JFrame implements ActionListener {
         if (Main.currentClass.equals("Select")) {
             JOptionPane.showMessageDialog(this, "Please choose a class!",
                     "Message", JOptionPane.PLAIN_MESSAGE);
-        }
+        } else {
 
-        // Takes to the page to add new face/student
-        if (e.getSource() == addNewFace) {
-            Main.intermediatePage.dispose();
-            try {
-                Main.newface = new NewFace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        if (e.getSource() == moreTraining) {
-            
-            // Takes to the training page
-            Main.intermediatePage.dispose();
-            try {
-                Main.training = new TrainFace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-            
-        }
-
-        if (e.getSource() == viewClass) {
-
-            try {
-                Main.studentlist = new StudentList();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            // Takes to the page to add new face/student
+            if (e.getSource() == addNewFace) {
+                Main.intermediatePage.dispose();
+                try {
+                    Main.newface = new NewFace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
 
+            if (e.getSource() == moreTraining) {
+
+                // Takes to the training page
+                Main.intermediatePage.dispose();
+                try {
+                    Main.training = new TrainFace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+
+            if (e.getSource() == viewClass) {
+
+                try {
+                    Main.studentlist = new StudentList();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
+
+            if (e.getSource() == attendanceHistory) {
+
+                Main.history = new AttendanceHistory();
+
+            }
+
         }
-
-        if (e.getSource() == attendanceHistory) {
-
-            Main.history = new AttendanceHistory();
-            
-        }
-
-
 
         if (e.getSource() == addClass) {
             try {
