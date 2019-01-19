@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.Flow;
 
@@ -31,7 +32,6 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
     JLabel title;
 
     JLabel askName = new JLabel("Name: ");
-    JComboBox nameBox = new JComboBox();
 
     JButton deleteAll = new JButton("Start from scratch");
     JButton register = new JButton("Take Snapshot");
@@ -138,7 +138,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         save.addActionListener(this);
         save.setBackground(Color.WHITE);
         save.setForeground(Color.BLACK);
-        // save.setBorderPainted(false);
+        // enter.setBorderPainted(false);
         buttons.add(save);
 
         buttons.setBounds(0, 620, getWidth(), 50);
@@ -149,8 +149,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 int confirmed = JOptionPane.showConfirmDialog(null,
-                        "Are you sure you want to exit the program?",
-                        "Confirmation", JOptionPane.YES_NO_OPTION);
+                        "Are you sure you want to exit the program?", "Confirmation", JOptionPane.YES_NO_OPTION);
 
                 if (confirmed == JOptionPane.YES_OPTION) {
                     dispose();
@@ -166,14 +165,24 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
     // Creates the data set for JComboBox
     public String[] comboboxDataSet() {
+        // Make an array from the list of files, and their names
         String[] array = Main.listFiles("res/studentFaceData/" + Main.currentTeacher + "/");
+
+        // Removes the extensions
+        for (int i = 0; i < array.length; i++) {
+            array[i] = array[i].substring(0, array[i].length()-4);
+        }
+
+        // Makes sure the list is easily lexicographically comprehensible
+        Arrays.sort(array);
+
         return array;
     }
 
     @Override
     public void saveNewState() throws IOException {
 
-        String filePathForFaceData = "res/studentFaceData/" + Main.currentTeacher + "/" + nameBox + ".txt";
+        String filePathForFaceData = "res/studentFaceData/" + Main.currentTeacher + "/" + nameChoser.getSelectedItem().toString() + ".txt";
         String filePathForInformation = "res/studentInformation/" + Main.currentTeacher + ".txt";
 
         // Creates a file from the filename for data manipulation
@@ -242,25 +251,6 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
             stream.write(bytes);
             stream.close();
 
-
-            // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
-            nameField.setEditable(false);
-            studentIDField.setEditable(false);
-
-            // Add new information about the student to the studentInformation file
-
-            // This string is formatted to store all information in a separated way, for the details
-            String formatted = String.format("\n%s,%s", nameField.getText(), studentIDField.getText());
-
-            // Stores the student information for future references
-
-            try {
-                Files.write(Paths.get(filePathForInformation), formatted.getBytes(), StandardOpenOption.APPEND);
-            }catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-
-
         } else {
 
             // In case no face is detected, show this
@@ -280,26 +270,33 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == timer) {
 
+            // Gets new image from webcam
+
             image = webcam.getImage();
+
+            //Sets the image to invisible
 
             imageLbl.setVisible(false);
 
             // FUNCTION: FLIP
-
-            for (int i=0;i<image.getWidth()/2;i++) {
+            for (int i = 0; i < image.getWidth() / 2; i++) {
                 for (int j = 0; j < image.getHeight(); j++) {
                     int tmp = image.getRGB(i, j);
 
+                    // FLIPS pixels over the y-axis, making the video output more comprehensible to the human brain
                     image.setRGB(i, j, image.getRGB(image.getWidth() - i - 1, j));
                     image.setRGB(image.getWidth() - i - 1, j, tmp);
 
                 }
             }
 
-            image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight())/2, 0, image.getHeight(), image.getHeight());
-            image = ImageAnalysis.resize(image, 400, 400);
+            // Crops the image to the right size
 
-            // Image dimg = image.getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
+            image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight()) / 2, 0, image.getHeight(), image.getHeight());
+            image = ImageAnalysis.resize(image, imageHeight, imageWidth);
+
+            // Creates new image icon for the image
+
             ImageIcon imageIcon = new ImageIcon(image);
             imageIcon.getImage().flush();
             imageLbl.setIcon(imageIcon);
@@ -309,13 +306,28 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
         if (e.getSource() == register) {
 
-            saveNewState();
+            if (nameChoser.getSelectedItem().toString().equals("Select")) {
+                JOptionPane.showMessageDialog(null, "Please choose a name",
+                        "ERROR", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+
+                try {
+                    saveNewState();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+
+            }
 
         }
 
         if (e.getSource() == save) {
             Main.training.dispose();
-            System.exit(0); // TODO: REMOVE LATER
+            try {
+                Main.intermediatePage = new IntermediatePage();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
 
     }

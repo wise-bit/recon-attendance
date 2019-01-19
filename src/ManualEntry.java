@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class ManualEntry extends JFrame implements ActionListener {
 
-    JTextField className;
+    JTextField name;
     JButton enter;
 
     boolean addingNew;
@@ -40,12 +40,12 @@ public class ManualEntry extends JFrame implements ActionListener {
         askClassName.setForeground(Color.WHITE);
         add(askClassName);
 
-        className = new JTextField();
-        className.setBounds(100, 130, 150, 40);
-        className.setOpaque(false);
-        className.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
-        className.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
-        add(className);
+        name = new JTextField();
+        name.setBounds(100, 130, 150, 40);
+        name.setOpaque(false);
+        name.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
+        name.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
+        add(name);
 
         enter = new JButton("Enter");
         enter.setBorder(IntermediatePage.blackBorder);
@@ -73,11 +73,11 @@ public class ManualEntry extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == enter) {
 
-            if (!(className.getText().equals("") || className.getText().contains(","))) {
+            if (!(name.getText().equals("") || name.getText().contains(","))) {
 
                 // TODO: Add files of storing student data based on face
 
-                File f = new File("res/attendanceData/" + Main.currentTeacher + "/" + className.getText() + ".txt");
+                File f = new File("res/attendanceData/" + Main.currentTeacher + "/" + name.getText() + ".txt");
 
                 Main.addClass.dispose();
                 Main.intermediatePage.dispose();

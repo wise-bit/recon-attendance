@@ -10,18 +10,23 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Scanner;
 
-public class StudentList extends JFrame implements ActionListener {
+public class StudentList extends JFrame implements ActionListener, MouseListener {
 
-    JComboBox classroomSelection;
     JTable dataTable;
     String[] columnNames = { "Index", "Student Name" };
 
     JLabel title;
+
+    HashMap<String, String> students = new HashMap<String, String>();
 
     /**
      * Constructor method
@@ -41,25 +46,12 @@ public class StudentList extends JFrame implements ActionListener {
         title.setFont(new Font(title.getFont().toString(), Font.BOLD,18));
         add(title, BorderLayout.PAGE_START);
 
-        // Makes a list for adding all of the exercises available to it, using the exercise object ArrayList
-        String[] classesList = new String[Main.allClasses.size()+1];
-        classesList[0] = "-- Select --";
-        for (int i = 0; i < Main.allClasses.size(); i++) {
-            classesList[i+1] = Main.allClasses.get(i).getName();
-        }
-
-        // Makes sure the list is easily lexicographically comprehensible
-        Arrays.sort(classesList);
-
-        // Makes a combobox using the exerciseList, which has an actionListener
-        // Instead of depending on yet another button
-        classroomSelection = new JComboBox(classesList);
-        classroomSelection.addActionListener(this);
-
         // Initializes the JTable using a method described later
         dataTable = new JTable(makeData(), columnNames);
         JScrollPane scrollableTable = new JScrollPane(dataTable);
         dataTable.setDefaultEditor(Object.class, null);
+
+        dataTable.addMouseListener(this);
 
         // Makes a panel, making placement easier
         JPanel comps = new JPanel();
@@ -67,7 +59,6 @@ public class StudentList extends JFrame implements ActionListener {
         comps.setLayout(new BoxLayout(comps, BoxLayout.PAGE_AXIS));
 
         // Adds all components
-        comps.add(classroomSelection);
         comps.add(scrollableTable);
         add(comps);
 
@@ -83,33 +74,39 @@ public class StudentList extends JFrame implements ActionListener {
      * @throws IOException
      */
 
+
     public String[][] makeData() throws IOException {
 
-        // TODO: Add to this method for dataset creation
-
-        if (classroomSelection.getSelectedItem().toString().equals("-- Select --")) {
-            String[][] temp = {{"", ""}};
-            return temp;
-        }
-
         // Defines the path to the right place
-        String path = "res/attendanceData/" + Main.currentTeacher + "/" + classroomSelection.getSelectedItem().toString();
-        String[][] temp = new String[Main.countFolders(path)+1][3];
+        String path = "res/studentInformation/" + Main.currentTeacher + ".txt";
+        String[][] temp = new String[Main.countLines(path)+1][3];
 
         int index = 0;
 
         // Independent from the global objects, since this functionality is built for viewing raw data
+        // (This same code was used in Main class as well)
         File file = new File(path);
-        String[] directoriesOfClasses = file.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory();
-            }
-        });
+        String[] people = new String[Main.countLines(path)];
 
-        for (int i = 0; i < directoriesOfClasses.length; i++) {
+        // Initializes scanner for reading the student list file
+        Scanner reader = new Scanner(file);
+
+        while (reader.hasNextLine()) {
+            // Store all attributes in array
+            String[] attribs = reader.nextLine().split(",");
+
+            // Assign it to the index of the previously defined array
+            people[index] = attribs[0];
+
+            //
+            students.put(people[index], attribs[1]);
+            index++;
+        }
+
+        // Reassign all imported data into the table
+        for (int i = 0; i < people.length; i++) {
             temp[i][0] = String.valueOf(i+1);
-            temp[i][1] = directoriesOfClasses[i];
+            temp[i][1] = people[i];
         }
 
         return temp;
@@ -123,31 +120,32 @@ public class StudentList extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        // Saved for extra features in the future
+    }
 
-        // If the classroomSelection undergoes any changes
-        if (e.getSource() == classroomSelection) {
+    public void mouseClicked(java.awt.event.MouseEvent e) {
+        int row = dataTable.rowAtPoint(e.getPoint());
+        int col = dataTable.columnAtPoint(e.getPoint());
+        JOptionPane.showMessageDialog(null,"Student ID: " + students.get(dataTable.getValueAt(row, col).toString()));
+    }
 
-            // Makes a new model, which is able to modify the data for the table
-            DefaultTableModel model = null;
+    @Override
+    public void mousePressed(MouseEvent e) {
 
-            // Makes a new model for the table
-            try {
-                model = new DefaultTableModel(makeData(), columnNames);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+    }
 
-            // Puts the model in the table
-            dataTable.setModel(model);
+    @Override
+    public void mouseReleased(MouseEvent e) {
 
-            if (!classroomSelection.getSelectedItem().toString().equals("-- Select --")) {
-                Main.currentClass = classroomSelection.getSelectedItem().toString();
-                title.setText("Students List for class " + Main.currentClass + " of teacher " + Main.currentTeacher);
-            } else {
-                title.setText("Students List");
-            }
+    }
 
-        }
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 

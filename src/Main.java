@@ -47,10 +47,33 @@
  * Description:
  *
  *
+ *      Taking attendance at the beginning of a class is time-consuming, and can take quite long depending on the total
+ *      population of the class. With the advent of facial recognition, it is a practical idea to use this to take attendance
+ *      automatically when the students walk into the room.
+ *
  * Features:
+ *
+ *      In a nutshell, reconattendance's components include:
+ *
+ *      1. A program which is able to recognize when a face is in range of the camera.
+ *      2. Allocate identification, or interest points on a recognized face in order to identify it.
+ *      3. Compare the digital data with data in the database in order to check if they are in the database.
+ *      4. Add the person’s attendance status to the database automatically.
+ *
+ *
+ *      (i) The program has an extremely unique method of recognition of facial recognition by primary treatment of images
+ *      to enhance certain features. Therefore, this approach not only makes the existing features work better, but also allows
+ *      future additions of more features of a face without too much effort. This makes the program very versatile.
+ *
+ *      (ii) All major features protected under a self-defined encryption system with a secure password to ensure students
+ *      cannot change any major aspects of the program without teachers' supervision
+ *
+ *      (i) Adding of further
  *
  *
  * Major Skills:
+ *
+ *      (i) Object oriented programming
  *
  *
  * Area of concern:
@@ -87,6 +110,7 @@ import java.awt.GraphicsEnvironment;
  */
 public class Main {
 
+    // Declares each of the important classes with GUI components for easy call and dispose
     public static Login login;
     public static Scan scan;
     public static TrainFace training;
@@ -98,6 +122,7 @@ public class Main {
     public static IntermediatePage intermediatePage;
     public static AddClass addClass;
     public static ManualEntry manualEntry;
+    public static FaceScanPage faceScanPage;
 
     public static ClassifyTest classifyTest;
 

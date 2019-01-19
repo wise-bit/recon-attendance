@@ -12,8 +12,10 @@ import java.util.Scanner;
 
 public class IntermediatePage extends JFrame implements ActionListener {
 
+    // A JComboBox to choose your class
     JComboBox classChooser;
 
+    // Declaration of all of the buttons
     JButton addNewFace = new JButton("Add New Student");
     JButton moreTraining = new JButton("Train Your Data");
     JButton viewClass = new JButton("View Your Class");
@@ -22,8 +24,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
     JButton addClass = new JButton("Add New Class");
     JButton logout = new JButton("Logout");
 
-    JButton chooseClass = new JButton("Select Class");
-
+    // A border for better visibility of objects
     public static Border blackBorder = BorderFactory.createLineBorder(Color.BLACK, 2, true);
 
     /**
@@ -51,6 +52,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         /////-----  ADDDING MAIN BUTTONS STARTS HERE  -----/////
 
+        // Adding a button for new face addition
         addNewFace.setFont(new Font("Verdana", Font.BOLD, 18));
         addNewFace.setBorder(blackBorder);
         addNewFace.setBounds(150, 100, 300, 30);
@@ -69,6 +71,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         });
         add(addNewFace);
 
+        // Adding a button for more training of facial features of one student
         moreTraining.setFont(new Font("Verdana", Font.BOLD, 18));
         moreTraining.setBorder(blackBorder);
         moreTraining.setBounds(150, 150, 300, 30);
@@ -87,6 +90,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         });
         add(moreTraining);
 
+        // Adding a button for viewing all students of a class
         viewClass.setFont(new Font("Verdana", Font.BOLD, 18));
         viewClass.setBorder(blackBorder);
         viewClass.setBounds(150, 200, 300, 30);
@@ -105,6 +109,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         });
         add(viewClass);
 
+        // Adding a button for attendance history
         attendanceHistory.setFont(new Font("Verdana", Font.BOLD, 18));
         attendanceHistory.setBorder(blackBorder);
         attendanceHistory.setBounds(150, 250, 300, 30);
@@ -122,10 +127,11 @@ public class IntermediatePage extends JFrame implements ActionListener {
             }
         });
         add(attendanceHistory);
-        
+
+        // Adding a button for taking the student to the page which allows the taking of attendance
         attendanceTime.setFont(new Font("Verdana", Font.BOLD, 18));
         attendanceTime.setBorder(blackBorder);
-        attendanceTime.setBounds(150, 250, 300, 30);
+        attendanceTime.setBounds(150, 300, 300, 30);
         attendanceTime.setBackground(Color.WHITE);
         attendanceTime.setForeground(Color.BLACK);
         attendanceTime.addActionListener(this);
@@ -140,10 +146,11 @@ public class IntermediatePage extends JFrame implements ActionListener {
             }
         });
         add(attendanceTime);
-        
+
+        // Adding a button for adding a new class to the database of the teacher
         addClass.setFont(new Font("Verdana", Font.BOLD, 18));
         addClass.setBorder(blackBorder);
-        addClass.setBounds(150, 300, 300, 30);
+        addClass.setBounds(600, 200, 300, 30);
         addClass.setBackground(Color.WHITE);
         addClass.setForeground(Color.BLACK);
         addClass.addActionListener(this);
@@ -161,6 +168,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         /////-----  ADDDING MAIN BUTTONS ENDS HERE  -----/////
 
+        // Adding a JComboBox for choosing active class
         classChooser = new JComboBox(Main.listFilesFolders("res/attendanceData/" + Main.currentTeacher));
         classChooser.addItem("Select");
         classChooser.setSelectedItem("Select");
@@ -169,9 +177,10 @@ public class IntermediatePage extends JFrame implements ActionListener {
         classChooser.setVisible(true);
         add(classChooser);
 
+        // Button to log out and go back to the login screen, for another teacher to log in
         logout.setFont(new Font("Verdana", Font.BOLD, 18));
         logout.setBorder(blackBorder);
-        logout.setBounds(600, 250, 300, 30);
+        logout.setBounds(600, 300, 300, 30);
         logout.setBackground(Color.WHITE);
         logout.setForeground(Color.BLACK);
         logout.addActionListener(this);
@@ -187,6 +196,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
         });
         add(logout);
 
+        // Ensures that current is not a blank item, therefore preventing crashes
         String current = classChooser.getSelectedItem().toString();
         Main.currentClass = current;
 
@@ -197,6 +207,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        // Adds actionlistener to classChooser to choose a class
         if (e.getSource() == classChooser) {
 
             String current = classChooser.getSelectedItem().toString();
@@ -204,6 +215,7 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
         } else
 
+            // Adds actionlistener to add new class
         if (e.getSource() == addClass) {
             try {
                 Main.addClass = new AddClass();
@@ -212,8 +224,10 @@ public class IntermediatePage extends JFrame implements ActionListener {
             }
         } else
 
+            // Adds actionlistener to logout button to go back to login screen
         if (e.getSource() == logout) {
 
+            // Logs out of the current user account
             Main.intermediatePage.dispose();
             try {
                 Main.login = new Login();
@@ -221,15 +235,17 @@ public class IntermediatePage extends JFrame implements ActionListener {
                 e1.printStackTrace();
             }
 
-        } else
-
-        if (Main.currentClass.equals("Select")) {
+        }
+        else if (Main.currentClass.equals("Select")) // Ensures that the user has chosen a class
+        {
             JOptionPane.showMessageDialog(this, "Please choose a class!",
                     "Message", JOptionPane.PLAIN_MESSAGE);
         } else {
 
             // Takes to the page to add new face/student
             if (e.getSource() == addNewFace) {
+
+                // // Creates an instance of the new face class
                 Main.intermediatePage.dispose();
                 try {
                     Main.newface = new NewFace();
@@ -238,10 +254,12 @@ public class IntermediatePage extends JFrame implements ActionListener {
                 }
             }
 
+            // Adds actionlistener to training button to add more training data
             if (e.getSource() == moreTraining) {
 
                 // Takes to the training page
                 Main.intermediatePage.dispose();
+                // Creates an instance of the train face class
                 try {
                     Main.training = new TrainFace();
                 } catch (IOException e1) {
@@ -250,8 +268,10 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
             }
 
+            // Acitonlistener for button for viewClass
             if (e.getSource() == viewClass) {
 
+                // Creates an instance of the student list class
                 try {
                     Main.studentlist = new StudentList();
                 } catch (IOException e1) {
@@ -260,9 +280,22 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
             }
 
+            // This show the attendance history when clicked
             if (e.getSource() == attendanceHistory) {
 
+                // Creates an instance of the attendance history class
                 Main.history = new AttendanceHistory();
+
+            }
+
+            // Adds functionality to attendance time button, which is clicked when it is time to take attendance
+            if (e.getSource() == attendanceTime) {
+
+                try {
+                    Main.faceScanPage = new FaceScanPage();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
             }
 

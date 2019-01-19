@@ -413,16 +413,19 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
                 for (int j = 0; j < image.getHeight(); j++) {
                     int tmp = image.getRGB(i, j);
 
+                    // FLIPS pixels over the y-axis, making the video output more comprehensible to the human brain
                     image.setRGB(i, j, image.getRGB(image.getWidth() - i - 1, j));
                     image.setRGB(image.getWidth() - i - 1, j, tmp);
 
                 }
             }
 
-            //
+            // Crops the image to the right size
 
             image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight()) / 2, 0, image.getHeight(), image.getHeight());
             image = ImageAnalysis.resize(image, imageHeight, imageWidth);
+
+            // Creates new image icon for the image
 
             ImageIcon imageIcon = new ImageIcon(image);
             imageIcon.getImage().flush();
