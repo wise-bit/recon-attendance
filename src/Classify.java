@@ -20,6 +20,11 @@ public class Classify {
 
      */
 
+    /**
+     * Declares all of the necessary variables, which are also the attributes of the Face objects when later created
+     * The varible names are self-explanatory
+     */
+
     public BufferedImage image;
 
     public BufferedImage pixelatedImage;
@@ -85,12 +90,20 @@ public class Classify {
         this.image = image;
     }
 
-    // FIND HEAD
+
+    /**
+     * FIND HEAD
+     * @throws IOException
+     */
     public void assignHeadHaar() throws IOException {
 
+        // Keeps track of the longest streak of dark pixel trends, which is the head
         int top_length = 0;
+
+        // Keeps track of coordinates of the line being formed
         int[] coords = new int[3];
 
+        // Loops over all of the pixels of the image, while limiting the range to prevent out of bounds
         for (int y = 0; y < image.getHeight() / Classifiers.pixelAccuracy - 1; y++) {
             for (int x = 0; x < image.getWidth() / Classifiers.pixelAccuracy - 1; x++) {
 
@@ -101,6 +114,8 @@ public class Classify {
                     // Checks for total area score
                     int sector1Score = 0;
                     int sector2Score = 0;
+
+                    // Simultaneously maintaining two sectors, and scoring them based on their intensity
 
                     for (int j = 0; j < Classifiers.pixelAccuracy; j++) {
                         for (int i = 0; i < Classifiers.pixelAccuracy; i++) {
@@ -116,13 +131,16 @@ public class Classify {
                         }
                     }
 
+                    // Increments current length
                     currentLength++;
 
                     // NOTE: higher score means lighter color
 
+                    // If the sector trends continue, then continue adding onto it
                     if (sector2Score - sector1Score > 10000) {
                         continue;
                     } else {
+                        // Otherwise, check if it is longer than the last streams
                         if (currentLength > top_length) {
                             top_length = currentLength;
                             coords[0] = x * Classifiers.pixelAccuracy;
@@ -137,17 +155,17 @@ public class Classify {
             }
         }
 
+        // Draw a red line visualizing the head (used for training and observation purposes)
         Graphics2D g = (Graphics2D) getImage().getGraphics();
         g.setColor(Color.RED);
         g.setStroke(new BasicStroke(5));
         g.drawLine(coords[0], coords[2], coords[1], coords[2]);
 
+        // Stores all of the discovered coordinates
         headLength = Math.abs(coords[1] - coords[0]);
         headX1 = coords[0];
         headX2 = coords[1];
         headY = coords[2] + Classifiers.pixelAccuracy;
-
-        // assignEyesHaar();
 
     }
 
@@ -246,11 +264,14 @@ public class Classify {
         eyeLength = headLength / 3;
         int difference = 10;
 
+        // Keeps track of whether any eyes have been found or not
         boolean found = false;
 
+        // Keeps track of top length for eyebrows, though not as significant as the hair-line
         int top_length = 0;
         int[] coords = new int[3];
 
+        // Loops over quadrants 1 and 2 pixels of the image, where the eyes are located
         for (int y = 1; y < image.getHeight() / eyeLength / 2; y++) {
             for (int x = 1; x < image.getWidth() / eyeLength - 2; x++) {
 
@@ -263,11 +284,10 @@ public class Classify {
                     for (int i = 0; i < eyeLength; i++) {
                         if ((x) * eyeLength + i + eyeLength * 2 >= image.getWidth()) {
                             System.out.println(x);
-
                             break;
                         }
 
-                        //
+                        // Maintains three sectors separated vertically, checking if they match the pseudo-haar of eyes
                         sector1Score += ImageAnalysis.comprehensiveRGB(
                                 image.getRGB((x) * eyeLength + i,
                                         y * eyeLength + j));
@@ -289,13 +309,15 @@ public class Classify {
                 else
                     currentDifference = sector2Score - sector3Score;
 
-                // TODO: DO SOMETHING TO PREVENT THE EYES BEING LOCATED IN WEIRD PLACES
-
+                // Prevent any excessive jumps between intensities of pixels, resulting in eyes being placed in
+                // weird locations (later depreciated)
                 boolean bigJump = currentDifference > 1000;
 
+                // Checks if this is indeed the greatest difference of intensities
                 if (currentDifference > difference)
                     difference = currentDifference;
 
+                // Saves the coordinates
                 if (sector2Score - sector1Score >= difference && sector2Score - sector3Score >= difference) {
                     coords[0] = x * eyeLength;
                     coords[1] = x * eyeLength + eyeLength;
@@ -305,10 +327,11 @@ public class Classify {
             }
         }
 
-        System.out.println("\n" + top_length + ", which is, " + Arrays.toString(coords) + ". Difference: " + difference);
+        // Print statements for debugging purposes
+        // System.out.println("\n" + top_length + ", which is, " + Arrays.toString(coords) + ". Difference: " + difference);
+        // System.out.println(eyeLength);
 
-        System.out.println(eyeLength);
-
+        // Draws lines to visualize graphics of eyes
         Graphics2D g = (Graphics2D) getImage().getGraphics();
         g.setColor(Color.RED);
         g.setStroke(new BasicStroke(5));

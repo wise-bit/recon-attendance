@@ -1,3 +1,8 @@
+/**
+ * This page is used for the storage of a new face information.
+ * Fundamentally, it is a profile creation page for students
+ */
+
 import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
@@ -22,6 +27,7 @@ import java.util.Scanner;
 
 public class NewFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
 
+    // These strings help keep track of data in the text boxes
     public static String tempName = "";
     public static String tempID = "";
 
@@ -29,8 +35,10 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
     public static final int imageWidth = 400;
     public static final int imageHeight = 400;
 
+    // Declares the title
     JLabel title;
 
+    // Stores the JLabels asking the questions
     JLabel askName = new JLabel("Name: ");
     JLabel askEmail = new JLabel("Email: ");
     JLabel askTeacherPassword = new JLabel("Authorization");
@@ -39,10 +47,12 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
     JTextField studentIDField  =new JTextField();
     JTextField teacherPasswordBox = new JTextField();
 
+    // Declares buttons
     JButton register = new JButton("Take Snapshot");
     JButton save = new JButton("Save");
     JButton manualEntry = new JButton(("Manual Entry"));
 
+    // Keeping track of FPS
     JLabel fpsCountLabel;
     JSlider slider;
 
@@ -54,8 +64,13 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     private Timer timer = new Timer(delay, this);
 
+    // Border for visual prominence
     Border b = BorderFactory.createLineBorder(Color.BLACK, 5, true);
 
+    /**
+     * Constructor
+     * @throws IOException
+     */
     public NewFace() throws IOException {
 
         setSize(1000, 600);
@@ -63,9 +78,10 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Login to Reconattendance");
 
+        // Sets background image
         setContentPane(new JLabel(new ImageIcon(ImageIO.read(new File("res/background.jpeg")))));
 
-
+        // Sets title
         title = new JLabel("Add New Face", SwingConstants.CENTER);
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Verdana", Font.BOLD, 24));
@@ -74,45 +90,39 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
         // Main panel
 
+        // Opens webcam
         webcam = Webcam.getDefault();
         webcam.open();
 
+
         try {
 
+            //Ensures webcam is open
             webcam.open();
 
-            if (webcam.isOpen()) { //if web cam open
+            // Sets all of the other components of the image
+            if (webcam.isOpen()) {
                 image = webcam.getImage();
                 imageLbl = new JLabel();
-                // imageLbl.setSize(1024, 720);
-                Image dimg = image.getScaledInstance(450, 350, Image.SCALE_SMOOTH);
+                Image dimg = image.getScaledInstance(400, 400, Image.SCALE_SMOOTH);
                 imageLbl.setIcon(new ImageIcon(dimg));
-
-//            imageLbl.setHorizontalAlignment(JLabel.CENTER);
-//            imageLbl.setVerticalAlignment(JLabel.CENTER);
-
                 imageLbl.setBorder(b);
                 imageLbl.setBounds(500, 75, imageWidth, imageHeight);
                 add(imageLbl);
 
             } else {
+                // Error message if camera not found
                 JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
                         "Fatal Error", JOptionPane.PLAIN_MESSAGE);
             }
 
         } catch (Exception e) {
 
+            // Error message if camera not found
             JOptionPane.showMessageDialog(this, "Uh oh, cannot find webcam... please contact administrator.",
                     "Fatal Error", JOptionPane.PLAIN_MESSAGE);
 
         }
-
-        fpsCountLabel = new JLabel("FPS: " + (int) (1000 / delay), SwingConstants.CENTER);
-        add(fpsCountLabel);
-
-        slider = new JSlider(10, 60);
-        slider.addChangeListener(this);
-        add(slider);
 
         // Components
 
@@ -155,6 +165,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         studentIDField.setFont(new Font("Source Code Pro Semibold", Font.PLAIN, 18));
         add(studentIDField);
 
+        // Input field for teacher's password
         teacherPasswordBox.setBounds(250, 350 - 10, 175, 40);
         teacherPasswordBox.setOpaque(false);
         teacherPasswordBox.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
@@ -168,23 +179,27 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         buttons.setBackground(new Color(0, 0, 0));
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 10));
 
+        // Register button
         register.addActionListener(this);
         register.setBackground(Color.WHITE);
         register.setForeground(Color.BLACK);
         register.setBorderPainted(false);
         buttons.add(register);
 
+        // Save button
         save.addActionListener(this);
         save.setBackground(Color.WHITE);
         save.setForeground(Color.BLACK);
         save.setBorderPainted(false);
         buttons.add(save);
 
+        // Adds buttons
         buttons.add(register);
         buttons.add(save);
 
         buttons.setBounds(0, getHeight()-100, getWidth(), 50);
 
+        // Adds panel
         add(buttons);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);

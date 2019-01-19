@@ -27,19 +27,23 @@ import java.util.Scanner;
  */
 public class FaceScanPage extends JFrame implements ActionListener {
 
+    // Stores informaiton for making a date, when storing attendance data for a specific date
     private int year = new Date().getYear() + 1900;
     private int month = new Date().getMonth();
     private int day = new Date().getDate();
     private String date;
 
+    // Keeps track of further components such as the title and the webcam
     JLabel title;
     Webcam webcam;
     BufferedImage image;
     JLabel imageLbl = new JLabel();
 
+    // Specifies the width and height of the image
     public static final int imageWidth = 400;
     public static final int imageHeight = 400;
 
+    // Delay of timer, and timer initializaiton
     int delay = 30;
     private Timer timer = new Timer(delay, this);
 
@@ -117,8 +121,10 @@ public class FaceScanPage extends JFrame implements ActionListener {
 
         buttons.setBounds(0, getHeight()-100, getWidth(), 50);
 
+        // Adds buttons
         add(buttons);
 
+        // Starts timer
         timer.start();
         setVisible(true);
 

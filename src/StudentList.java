@@ -98,7 +98,7 @@ public class StudentList extends JFrame implements ActionListener, MouseListener
             // Assign it to the index of the previously defined array
             people[index] = attribs[0];
 
-            //
+            // Adds student info to hashmap for future reference as well
             students.put(people[index], attribs[1]);
             index++;
         }

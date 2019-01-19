@@ -51,6 +51,8 @@
  *      population of the class. With the advent of facial recognition, it is a practical idea to use this to take attendance
  *      automatically when the students walk into the room.
  *
+ *      This program does so without using any pre-existing libraries, but using an entirely new algorithm.
+ *
  * Features:
  *
  *      In a nutshell, reconattendance's components include:
@@ -68,12 +70,20 @@
  *      (ii) All major features protected under a self-defined encryption system with a secure password to ensure students
  *      cannot change any major aspects of the program without teachers' supervision
  *
- *      (i) Adding of further
+ *      (iii) Adding of further versions of a face over time to improve results.
+ *
+ *      (iv) A generally fully functional attendance app with or without the camera support, to a certain extent
+ *
+ *      (v) A new and innovative way of processing images and using them for training models and tweaking parameters
  *
  *
  * Major Skills:
  *
- *      (i) Object oriented programming
+ *      (i) Object oriented programming - Teachers, Students, Classes, Faces
+ *      (2) Image Processing - The whole project is based on image manipulation
+ *      (3) Object comparisons
+ *      (4) Mathematical innovation
+ *      (5) Significant planning skills for development of new algorithms
  *
  *
  * Area of concern:
@@ -84,6 +94,9 @@
  *      (ii) The algorithm used in this program is built from the ground up, from scratch. Therefore, it has very minimal
  *      training concerning machine learning, and the mathematical capabilities of the models are incomparable to other projects
  *      such as OpenCV. Therefore, the results may often be false.
+ *
+ *      (iii) Due to lack of time, the models were not trained well enough, but if given the chance, this program is capable
+ *      of performing much better over time.
  *
  *
  *

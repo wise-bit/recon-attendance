@@ -17,6 +17,12 @@ public class ClassifyTest {
     Mahmoud Afifi and Abdelrahman Abdelhamed, "AFIF4: Deep gender classification based on an AdaBoost-based
     fusion of isolated facial features and foggy faces". arXiv:1706.04277, arXiv 2017.
 
+
+    PLEASE IGNORE THIS CLASS, THIS IS ALMOST THE EXACT COPY OF CLASSIFY.JAVA, BUT MADE FOR STORING TRAINED DATA FOR
+    VISUAL ANALYSIS PURPOSES
+
+    THERE ARE NO FURTHER COMMENTS HERE SINCE MOST OF IT IS REPEATED FROM CLASSIFY.JAVA
+
      */
 
     public BufferedImage image;

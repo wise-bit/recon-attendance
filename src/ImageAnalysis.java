@@ -1,31 +1,36 @@
+/**
+ * This is the most unique and most important class of the program, since it uses image manipulation to create a new image
+ * which can be used to train machine learning models with, or general template matching as well.
+ */
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ImageAnalysis {
 
-    // This main is to be deleted later
-
+    // These two colors are used a lot of production of new imafes
     public static final int BLACK = RGBGenerator(0, 0, 0);
     public static final int WHITE = RGBGenerator(255, 255, 255);
-    public static final int sensitivity = -1000000;
-    public static final int landmarkSize = 5;
-    public static final int segmentation = 200;
 
-    public static void main(String[] args) throws IOException {
-        BufferedImage img = ImageIO.read(new File("res/pureTestSets/face1.png"));
-        String filePath = "res/pureTestSets/";
-        ImageIO.write(trainingReady(img), "PNG", new File(filePath + "modifiedImage1.png"));
-    }
+    // These guide the general functionality of the program
+
+    // How sensetive the pixel sensing should be
+    public static final int sensitivity = -1000000;
+
+    // Radius of landmarks being placed
+    public static final int landmarkSize = 5;
+
+    // Size of each segment of an image when being divided, in pixels
+    public static final int segmentation = 200;
 
 
     public static BufferedImage furtherModifcation(BufferedImage img) {
+        // Ready for training
         img = trainingReady(img);
 
         BufferedImage boldedImage = bold(img);
@@ -165,6 +170,7 @@ public class ImageAnalysis {
     }
 
     // Creates glitch style image for future comparison
+    // This uses the principle of assigning vectors to replace color
     public static BufferedImage createGlitch(BufferedImage image) {
 
         BufferedImage newImage = new BufferedImage(image.getWidth() * 3, image.getHeight() * 3, BufferedImage.TYPE_INT_RGB);
@@ -215,6 +221,7 @@ public class ImageAnalysis {
                     posOfPix = 8;
                 }
 
+                // Loops through a 3x3 matrix, making new pixel blocks
                 for (int x = 0; x < 3; x++) {
                     for (int y = 0; y < 3; y++) {
                         try {
@@ -245,6 +252,7 @@ public class ImageAnalysis {
             }
         }
 
+        // Places landmarks
         for (int y = 10; y < image.getHeight(); y++) {
             for (int x = 10; x < image.getWidth(); x++) {
                 if (comprehensiveRGB(image.getRGB(x, y)) == 0){
@@ -267,16 +275,28 @@ public class ImageAnalysis {
         return subImgage;
     }
 
+    /**
+     * Creates a mask on the image, later depreciated
+     * @param image
+     * @param x
+     * @param y
+     * @param length
+     * @param width
+     * @return
+     */
     public static BufferedImage mask(BufferedImage image, int x, int y, int length, int width) // boolean?
     {
         BufferedImage imageCopy = new BufferedImage(length, width, BufferedImage.TYPE_INT_RGB);
-
-        // TODO: finish masking algorithm
 
         return imageCopy;
 
     }
 
+    /**
+     * Assigns landmarks
+     * @param image
+     * @return
+     */
     public static BufferedImage visualLandmarkAssignment(BufferedImage image) {
 
         // BufferedImage imageCopy = image;
@@ -326,6 +346,7 @@ public class ImageAnalysis {
 
     }
 
+    // Prints out the actual values of RGB blocks for better human understanding
     public static void printReverseRGB(int RGB) {
         int red = (RGB >> 16) & 0xFF;
         int green = (RGB >> 8) & 0xFF;
@@ -333,6 +354,7 @@ public class ImageAnalysis {
         System.out.printf("%d --> %d,%d,%d\n", RGB, red, green, blue);
     }
 
+    // Converts to a version which is understandable to both humans and machine to a certain extent when it comes to comparing
     public static int comprehensiveRGB(int RGB) {
         int red = (RGB >> 16) & 0xFF;
         int green = (RGB >> 8) & 0xFF;

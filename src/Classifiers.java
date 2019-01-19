@@ -1,3 +1,7 @@
+/**
+ * This class is kept for future use, while also serving as a base for the pixel accuracy constant
+ */
+
 import java.awt.image.BufferedImage;
 
 public class Classifiers {
