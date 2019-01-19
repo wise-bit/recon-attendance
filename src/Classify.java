@@ -1,3 +1,7 @@
+/**
+ * This class contains the classifier methods. Please refer to attached appendix for further notes on how it all works.
+ */
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -37,8 +41,14 @@ public class Classify {
 
     public String imageName;
 
+    // Checks if the image is indeed a face based on existence of features
     boolean isFace = true;
 
+    /**
+     * Constructor
+     * @param img
+     * @throws IOException
+     */
     public Classify(BufferedImage img) throws IOException {
 
         setImage(img);
@@ -49,10 +59,18 @@ public class Classify {
 
     }
 
+    /**
+     * Gets image name
+     * @return imageName
+     */
     public String getImageName() {
         return imageName;
     }
 
+    /**
+     * Sets image name
+     * @param imageName
+     */
     public void setImageName(String imageName) {
         this.imageName = imageName;
     }
@@ -224,6 +242,7 @@ public class Classify {
     // Redundant function, but kept for future references
     public void assignEyesHaar() throws IOException {
 
+        // Describes some initial ratios based on ratios of facial features
         eyeLength = headLength / 3;
         int difference = 10;
 
@@ -247,6 +266,8 @@ public class Classify {
 
                             break;
                         }
+
+                        //
                         sector1Score += ImageAnalysis.comprehensiveRGB(
                                 image.getRGB((x) * eyeLength + i,
                                         y * eyeLength + j));

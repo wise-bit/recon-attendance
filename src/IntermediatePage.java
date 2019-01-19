@@ -284,7 +284,11 @@ public class IntermediatePage extends JFrame implements ActionListener {
             if (e.getSource() == attendanceHistory) {
 
                 // Creates an instance of the attendance history class
-                Main.history = new AttendanceHistory();
+                try {
+                    Main.history = new AttendanceHistory();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
             }
 

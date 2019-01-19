@@ -19,8 +19,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class AttendanceHistory extends JFrame implements ActionListener, MouseListener {
+public class AttendanceHistory extends JFrame implements ActionListener {
 
+    JComboBox classroomSelection;
     JTable dataTable;
     String[] columnNames = { "Index", "Student Name" };
 
@@ -46,12 +47,26 @@ public class AttendanceHistory extends JFrame implements ActionListener, MouseLi
         title.setFont(new Font(title.getFont().toString(), Font.BOLD,18));
         add(title, BorderLayout.PAGE_START);
 
+        String[] classesList = Main.listFiles("res/attendanceData/" + Main.currentTeacher + "/" + Main.currentClass + "/");
+
+        for (int i = 0; i < classesList.length; i++) {
+            classesList[i] = classesList[i].substring(0, classesList[i].length()-4);
+        }
+
+        // Makes sure the list is easily lexicographically comprehensible
+        Arrays.sort(classesList);
+
+        // Makes a combobox using the exerciseList, which has an actionListener
+        // Instead of depending on yet another button
+        classroomSelection = new JComboBox(classesList);
+        classroomSelection.setSelectedItem(classesList.length-1);
+        System.out.println(classroomSelection.getSelectedItem());
+        classroomSelection.addActionListener(this);
+
         // Initializes the JTable using a method described later
         dataTable = new JTable(makeData(), columnNames);
         JScrollPane scrollableTable = new JScrollPane(dataTable);
         dataTable.setDefaultEditor(Object.class, null);
-
-        dataTable.addMouseListener(this);
 
         // Makes a panel, making placement easier
         JPanel comps = new JPanel();
@@ -59,6 +74,7 @@ public class AttendanceHistory extends JFrame implements ActionListener, MouseLi
         comps.setLayout(new BoxLayout(comps, BoxLayout.PAGE_AXIS));
 
         // Adds all components
+        comps.add(classroomSelection);
         comps.add(scrollableTable);
         add(comps);
 
@@ -77,8 +93,14 @@ public class AttendanceHistory extends JFrame implements ActionListener, MouseLi
 
     public String[][] makeData() throws IOException {
 
+        // If user selects blank option, return blank table
+        if (classroomSelection.getSelectedItem().toString().equals("-- Select --")) {
+            String[][] temp = {{"", ""}};
+            return temp;
+        }
+
         // Defines the path to the right place
-        String path = "res/studentInformation/" + Main.currentTeacher + ".txt";
+        String path = "res/attendanceData/" + Main.currentTeacher + "/" + Main.currentClass + "/" + classroomSelection.getSelectedItem().toString() + ".txt";
         String[][] temp = new String[Main.countLines(path)+1][3];
 
         int index = 0;
@@ -88,18 +110,16 @@ public class AttendanceHistory extends JFrame implements ActionListener, MouseLi
         File file = new File(path);
         String[] people = new String[Main.countLines(path)];
 
-        // Initializes scanner for reading the student list file
         Scanner reader = new Scanner(file);
 
         while (reader.hasNextLine()) {
             // Store all attributes in array
-            String[] attribs = reader.nextLine().split(",");
+            String attribs = reader.nextLine();
 
             // Assign it to the index of the previously defined array
-            people[index] = attribs[0];
+            people[index] = attribs;
 
-            //
-            students.put(people[index], attribs[1]);
+            // increments index
             index++;
         }
 
@@ -120,32 +140,31 @@ public class AttendanceHistory extends JFrame implements ActionListener, MouseLi
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // Saved for extra features in the future
-    }
 
-    public void mouseClicked(java.awt.event.MouseEvent e) {
-        int row = dataTable.rowAtPoint(e.getPoint());
-        int col = dataTable.columnAtPoint(e.getPoint());
-        JOptionPane.showMessageDialog(null,"Student ID: " + students.get(dataTable.getValueAt(row, col).toString()));
-    }
+        // If the classroomSelection undergoes any changes
+        if (e.getSource() == classroomSelection) {
 
-    @Override
-    public void mousePressed(MouseEvent e) {
+            // Makes a new model, which is able to modify the data for the table
+            DefaultTableModel model = null;
 
-    }
+            // Makes a new model for the table
+            try {
+                model = new DefaultTableModel(makeData(), columnNames);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
+            // Puts the model in the table
+            dataTable.setModel(model);
 
-    }
+            if (!classroomSelection.getSelectedItem().toString().equals("-- Select --")) {
+                Main.currentClass = classroomSelection.getSelectedItem().toString();
+                title.setText("Attendance of " + Main.currentClass + " of teacher " + Main.currentTeacher);
+            } else {
+                title.setText("Students List");
+            }
 
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
+        }
 
     }
 

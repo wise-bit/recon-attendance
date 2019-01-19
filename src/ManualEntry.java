@@ -1,3 +1,7 @@
+/**
+ * This class is for manual entry of data, if facial recognition fails to work
+ */
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -8,11 +12,15 @@ import java.io.IOException;
 
 public class ManualEntry extends JFrame implements ActionListener {
 
-    JTextField name;
+    JComboBox name;
     JButton enter;
 
     boolean addingNew;
 
+    /**
+     * @param addingNew
+     * @throws IOException
+     */
     public ManualEntry(boolean addingNew) throws IOException {
 
         this.addingNew = addingNew;
@@ -26,21 +34,21 @@ public class ManualEntry extends JFrame implements ActionListener {
 
         // getContentPane().setBackground(Color.YELLOW);
 
-        JLabel title = new JLabel("Add new Class", SwingConstants.CENTER);
+        JLabel title = new JLabel("Manual Attendance", SwingConstants.CENTER);
         title.setBounds(0, 20, 1000, 50);
         title.setFont(new Font("Microsoft YaHei", Font.BOLD, 24));
         title.setVisible(true);
         title.setForeground(Color.YELLOW);
         add(title);
 
-        JLabel askClassName = new JLabel("Class name: ");
+        JLabel askClassName = new JLabel("Name: ");
         askClassName.setBounds(100, 100, 150, 20);
         askClassName.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 18));
         askClassName.setVisible(true);
         askClassName.setForeground(Color.WHITE);
         add(askClassName);
 
-        name = new JTextField();
+        name = new JComboBox();
         name.setBounds(100, 130, 150, 40);
         name.setOpaque(false);
         name.setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, Color.WHITE));
@@ -73,23 +81,14 @@ public class ManualEntry extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == enter) {
 
-            if (!(name.getText().equals("") || name.getText().contains(","))) {
+            File f = new File("res/attendanceData/" + Main.currentTeacher + "/" + name.getSelectedItem().toString() + ".txt");
 
-                // TODO: Add files of storing student data based on face
-
-                File f = new File("res/attendanceData/" + Main.currentTeacher + "/" + name.getText() + ".txt");
-
-                Main.addClass.dispose();
-                Main.intermediatePage.dispose();
-                try {
-                    Main.intermediatePage = new IntermediatePage();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid class name, please try again!",
-                        "Message", JOptionPane.PLAIN_MESSAGE);
+            Main.addClass.dispose();
+            Main.intermediatePage.dispose();
+            try {
+                Main.intermediatePage = new IntermediatePage();
+            } catch (IOException e1) {
+                e1.printStackTrace();
             }
 
         }

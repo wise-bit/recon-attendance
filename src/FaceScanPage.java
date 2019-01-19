@@ -1,3 +1,8 @@
+/**
+ * This is one of the most crucial classes of the program, since it scans the face and identifies it using algorithms
+ * defined elsewhere in other classes.
+ */
+
 import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
@@ -8,15 +13,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Scanner;
 
+/**
+ * @extends JFrame
+ * @implements ActionListener
+ */
 public class FaceScanPage extends JFrame implements ActionListener {
 
     private int year = new Date().getYear() + 1900;
@@ -116,6 +124,21 @@ public class FaceScanPage extends JFrame implements ActionListener {
 
     }
 
+    // Checks if person is already admitted for the day
+    public boolean alreadyAdmitted(String name, String path) throws FileNotFoundException {
+
+        Scanner reader = new Scanner(new File(path));
+
+        // Checks every person already added
+        while (reader.hasNextLine()) {
+            String current = reader.nextLine();
+            if (current.equals(name))
+                return true;
+        }
+        return false;
+
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -156,7 +179,7 @@ public class FaceScanPage extends JFrame implements ActionListener {
         }
 
         if (e.getSource() == manualEntry) {
-            Main.newface.dispose();
+            Main.faceScanPage.dispose();
             try {
                 Main.manualEntry = new ManualEntry(true);
             } catch (IOException e1) {
@@ -226,9 +249,23 @@ public class FaceScanPage extends JFrame implements ActionListener {
                         // Write to the attendance folder
                         String pathToAttendanceFile = "res/attendanceData/" + Main.currentTeacher + "/" + Main.currentClass + "/" + date + ".txt";
                         File attendanceFile = new File(pathToAttendanceFile);
-                        attendanceFile.createNewFile();
-                        // Take substring to remove extension from file name, which was used as identity
-                        Files.write(Paths.get(pathToAttendanceFile), identity.substring(0, identity.length()-4).getBytes(), StandardOpenOption.APPEND);
+
+                        // Checks if the person was already admitted to the class for that day or not
+                        if (!alreadyAdmitted(identity.substring(0, identity.length() - 4), pathToAttendanceFile)) {
+
+                            boolean newline = false;
+
+                            if (attendanceFile.exists())
+                                newline = true;
+
+                            attendanceFile.createNewFile();
+                            // Take substring to remove extension from file name, which was used as identity
+                            if (newline)
+                                Files.write(Paths.get(pathToAttendanceFile), ("\n" + identity.substring(0, identity.length() - 4)).getBytes(), StandardOpenOption.APPEND);
+                            else
+                                Files.write(Paths.get(pathToAttendanceFile), (identity.substring(0, identity.length() - 4)).getBytes(), StandardOpenOption.APPEND);
+
+                        }
 
                     }
 

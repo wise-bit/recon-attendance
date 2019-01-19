@@ -126,7 +126,8 @@ public class StudentList extends JFrame implements ActionListener, MouseListener
     public void mouseClicked(java.awt.event.MouseEvent e) {
         int row = dataTable.rowAtPoint(e.getPoint());
         int col = dataTable.columnAtPoint(e.getPoint());
-        JOptionPane.showMessageDialog(null,"Student ID: " + students.get(dataTable.getValueAt(row, col).toString()));
+        if (col == 1)
+            JOptionPane.showMessageDialog(null,"Student ID: " + students.get(dataTable.getValueAt(row, col).toString()));
     }
 
     @Override

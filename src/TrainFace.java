@@ -176,9 +176,14 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         // Makes sure the list is easily lexicographically comprehensible
         Arrays.sort(array);
 
+        // Returns sorted array
         return array;
     }
 
+    /**
+     * Saves new state
+     * @throws IOException
+     */
     @Override
     public void saveNewState() throws IOException {
 
