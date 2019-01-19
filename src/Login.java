@@ -154,8 +154,10 @@ public class Login extends JFrame implements ActionListener {
 
     }
 
+    // Ensures that the username is unique
     public boolean unique() {
 
+        // Loops through all of the teacher objects
         for (Teacher t : Main.teacherAccounts) {
             if (t.getName().equals(usernameBox.getText())) {
                 return false;
@@ -174,11 +176,20 @@ public class Login extends JFrame implements ActionListener {
 
         if (e.getSource() == login) {
 
+            // Ensures there are no commas in the name, which can break the program potentially, since it is used as a delimiter
+
+            // Checks that the username is not blank
             if (usernameBox.getText().contains(",") || usernameBox.getText().length() == 0) {
                 JOptionPane.showMessageDialog(null, "Invalid username", "Error", JOptionPane.INFORMATION_MESSAGE);
-            } else if (String.valueOf(passwordBox.getPassword()).contains(",") || String.valueOf(passwordBox.getPassword()).length() == 0) {
+            }
+
+            // Checks that the password box is not blank
+            else if (String.valueOf(passwordBox.getPassword()).contains(",") || String.valueOf(passwordBox.getPassword()).length() == 0) {
                 JOptionPane.showMessageDialog(null, "Invalid password", "Error", JOptionPane.INFORMATION_MESSAGE);
-            } else {
+            }
+
+            // When everything checks out
+            else {
                 String currentUserInput = usernameBox.getText();
                 String currentPasswordInput = Encryption.encrypt(String.valueOf(passwordBox.getPassword()));
 

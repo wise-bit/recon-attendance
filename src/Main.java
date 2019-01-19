@@ -10,6 +10,28 @@
  * Reconattendance - ICS4U1 - final project *
  ********************************************
  *
+ *
+ *    _____       _             _ _ _      _____ _           _   _            _
+ *   / ____|     | |           (_|_) |    / ____| |         | | | |          (_)
+ *  | (___   __ _| |_ _ __ __ _ _ _| |_  | |    | |__   __ _| |_| |_ ___ _ __ _  ___  ___
+ *   \___ \ / _` | __| '__/ _` | | | __| | |    | '_ \ / _` | __| __/ _ \ '__| |/ _ \/ _ \
+ *   ____) | (_| | |_| | | (_| | | | |_  | |____| | | | (_| | |_| ||  __/ |  | |  __/  __/
+ *  |_____/ \__,_|\__|_|  \__,_| |_|\__|  \_____|_| |_|\__,_|\__|\__\___|_|  | |\___|\___|
+ *                            _/ |                                          _/ |
+ *                           |__/                                          |__/
+ *
+ *
+ *
+ *      _____                            _   _                 _
+ *     |  __ \                          | | | |               | |
+ *     | |__) |___  ___ ___  _ __   __ _| |_| |_ ___ _ __   __| | __ _ _ __   ___ ___
+ *     |  _  // _ \/ __/ _ \| '_ \ / _` | __| __/ _ \ '_ \ / _` |/ _` | '_ \ / __/ _ \
+ *     | | \ \  __/ (_| (_) | | | | (_| | |_| ||  __/ | | | (_| | (_| | | | | (_|  __/
+ *     |_|  \_\___|\___\___/|_| |_|\__,_|\__|\__\___|_| |_|\__,_|\__,_|_| |_|\___\___|
+ *
+ *
+ *
+ *
  * Name:
  *      Satrajit Chatterjee
  *
@@ -96,15 +118,10 @@ public class Main {
 
         init();
 
-        // listFonts();
-
         // Testing purposes
         //trainTestDataset();
 
         login = new Login();
-
-        // training = new TrainFace(); // move this to login sreen
-        // newface = new NewFace();
 
     }
 
@@ -257,16 +274,5 @@ public class Main {
             classifyTest = new ClassifyTest(ImageAnalysis.trainingReady(img), image);
         }
     }
-
-    /**
-     * Lists fonts
-     */
-    public static void listFonts() {
-        String fonts[] = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        for ( int i = 0; i < fonts.length; i++ ) {
-            System.out.println(fonts[i]);
-        }
-    }
-
 
 }

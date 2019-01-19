@@ -16,6 +16,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Scanner;
 
 public class NewFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
@@ -178,14 +180,6 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         save.setBorderPainted(false);
         buttons.add(save);
 
-        buttons.add(Box.createRigidArea(new Dimension(50,0)));
-
-        manualEntry.addActionListener(this);
-        manualEntry.setBackground(Color.WHITE);
-        manualEntry.setForeground(Color.BLACK);
-        manualEntry.setBorderPainted(false);
-        buttons.add(manualEntry);
-
         buttons.add(register);
         buttons.add(save);
 
@@ -219,9 +213,14 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     }
 
+    /**
+     * Saves a new image state
+     * @throws IOException
+     */
     @Override
     public void saveNewState() throws IOException {
 
+        // Ensures the strings are not empty
         if (tempName.equals("")) {
             tempName = nameField.getText();
         }
@@ -234,17 +233,30 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
             JOptionPane.showMessageDialog(null, "Please enter a valid name", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             tempName = "";
             tempID = "";
-        } else if (tempID.equals("Student ID") || tempID.length() != 9 || tempID.contains(",")) {
+        }
+
+        // Ensures that the length of the student ID is 9
+        else if (tempID.equals("Student ID") || tempID.length() != 9 || tempID.contains(",")) {
             JOptionPane.showMessageDialog(null, "Please enter valid ID", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             tempName = "";
             tempID = "";
         } else {
 
-            if (!studentExists()) {
+            // Checks that the password is the same by running the custom hashing algorithm
+            if (!Encryption.encrypt(teacherPasswordBox.getText()).equals(Main.currentPassword)) {
+
+                JOptionPane.showMessageDialog(null, "Please enter correct authorization password",
+                        "Info", JOptionPane.INFORMATION_MESSAGE);
+
+            }
+
+            // Checks that the student does not already exist in the database
+            else if (!studentExists() && nameField.isEditable()) {
 
                 String filePathForFaceData = "res/studentFaceData/" + Main.currentTeacher + "/" + tempName + ".txt";
                 String filePathForInformation = "res/studentInformation/" + Main.currentTeacher + ".txt";
 
+                // Creates a file from the filename for data manipulation
                 File faceDir = new File(filePathForFaceData);
                 faceDir.createNewFile();
 
@@ -252,61 +264,95 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
                 Classify c = new Classify(image);
 
-                ////
+                // Only attempts to add a face if a face is detected
 
-                int prevHeadtoEye = 0;
-                int prevEyetoMouth = 0;
-                int prevHeadtoMouth = 0;
-                int prevHeadMouthRatio = 0;
+                if (c.isFace) {
 
-                int headtoEye = c.eyeY - c.headY;
-                int eyetoMouth = c.mouthY - c.eyeY;
-                int headtoMouth = c.mouthY - c.headY;
-                int headMouthRatio = (int)(Math.abs(c.headX2 - c.headX1)/Math.abs(c.mouthX1 - c.mouthX2));
+                    // Keeps track of old data to be read from file
+                    int prevHeadtoEye = 0;
+                    int prevEyetoMouth = 0;
+                    int prevHeadtoMouth = 0;
+                    int prevHeadMouthRatio = 0;
 
-                String data = "";
-                Scanner readOldFaceData = new Scanner(filePathForFaceData);
+                    // Creates the variables necessary to get all the details of the face, from the key features
+                    int headtoEye = c.eyeY - c.headY;
+                    int eyetoMouth = c.mouthY - c.eyeY;
+                    int headtoMouth = c.mouthY - c.headY;
+                    int headMouthRatio = (int) (Math.abs(c.headX2 - c.headX1) / Math.abs(c.mouthX1 - c.mouthX2));
 
-                if (Main.countLines(filePathForFaceData) > 0) {
+                    String data = "";
+                    Scanner readOldFaceData = new Scanner(new File(filePathForFaceData));
 
-                    // Averaging with old data, with old data prioritized slightly more in order to prevent drastic changes to data
+                    if (Main.countLines(filePathForFaceData) > 0) {
 
-                    String[] line = readOldFaceData.nextLine().split(",");
+                        // Averaging with old data, with old data prioritized slightly more in order to prevent drastic changes to data
 
-                    prevHeadtoEye = Integer.parseInt(line[0]);
-                    prevEyetoMouth = Integer.parseInt(line[1]);
-                    prevHeadtoMouth = Integer.parseInt(line[2]);
-                    prevHeadMouthRatio = Integer.parseInt(line[0]);
+                        String[] line = readOldFaceData.nextLine().split(",");
 
-                    // A ratio which reasonably doesn't change too much
+                        // Stores all of the old parameters by parsing them to integers
 
-                    double changeRatio = 0.2;
+                        prevHeadtoEye = Integer.parseInt(line[0]);
+                        prevEyetoMouth = Integer.parseInt(line[1]);
+                        prevHeadtoMouth = Integer.parseInt(line[2]);
+                        prevHeadMouthRatio = Integer.parseInt(line[0]);
 
-                    headtoEye = (int) (headtoEye*changeRatio + prevHeadtoEye*(1-changeRatio));
-                    eyetoMouth = (int) (eyetoMouth*changeRatio + prevEyetoMouth*(1-changeRatio));
-                    headtoMouth = (int) (headtoMouth*changeRatio + prevHeadtoMouth*(1-changeRatio));
-                    headMouthRatio = (int) (headMouthRatio*changeRatio + prevHeadMouthRatio*(1-changeRatio));
+                        // A ratio which reasonably doesn't change too much
 
+                        // This is the ratio of how much is allowed to be changed at once of the parameters (20%)
+
+                        double changeRatio = 0.2;
+
+                        // Modifying each of the past results to the updated ones
+
+                        headtoEye = (int) (headtoEye * changeRatio + prevHeadtoEye * (1 - changeRatio));
+                        eyetoMouth = (int) (eyetoMouth * changeRatio + prevEyetoMouth * (1 - changeRatio));
+                        headtoMouth = (int) (headtoMouth * changeRatio + prevHeadtoMouth * (1 - changeRatio));
+                        headMouthRatio = (int) (headMouthRatio * changeRatio + prevHeadMouthRatio * (1 - changeRatio));
+
+                    }
+
+                    // Formats the string in a way so that it can be read later in the future
+
+                    data = String.format("%d,%d,%d,%d", headtoEye, eyetoMouth, headtoMouth, headMouthRatio);
+
+                    // Stores the formatted string as a byte stream
+
+                    byte[] bytes = data.getBytes();
+                    FileOutputStream stream = new FileOutputStream(filePathForFaceData, false);
+                    stream.write(bytes);
+                    stream.close();
+
+                    // Only allows this to show up the first time
+                    if (nameField.isEditable()) {
+                        JOptionPane.showMessageDialog(null, "Success! Account Created. \n" +
+                                "You may now continue adding images for training.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    }
+
+                    // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
+                    nameField.setEditable(false);
+                    studentIDField.setEditable(false);
+
+                    // Add new information about the student to the studentInformation file
+
+                    // This string is formatted to store all information in a separated way, for the details
+                    String formatted = String.format("\n%s,%s", nameField.getText(), studentIDField.getText());
+
+                    // Stores the student information for future references
+
+                    try {
+                        Files.write(Paths.get(filePathForInformation), formatted.getBytes(), StandardOpenOption.APPEND);
+                    }catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+
+
+                } else {
+
+                    // In case no face is detected, show this
+
+                    JOptionPane.showMessageDialog(null, "No face detected, please try again...",
+                            "Info", JOptionPane.INFORMATION_MESSAGE);
                 }
-
-                data = String.format("%d,%d,%d,%d", headtoEye, eyetoMouth, headtoMouth, headMouthRatio);
-
-                byte[] bytes = data.getBytes();
-                FileOutputStream stream = new FileOutputStream(filePathForFaceData, false);
-                stream.write(bytes);
-                stream.close();
-
-                ////
-
-                // Only allows this to show up the first time
-                if (nameField.isEditable()) {
-                    JOptionPane.showMessageDialog(null, "Success! Account Created. \n" +
-                            "You may now continue adding images for training.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                }
-
-                // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
-                nameField.setEditable(false);
-                studentIDField.setEditable(false);
 
             } else {
 
@@ -319,9 +365,13 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     }
 
+    // Checks if the student already exists in the database
+
     public boolean studentExists() throws FileNotFoundException {
 
         Scanner reader = new Scanner(new File("res/studentInformation/" + Main.currentTeacher + ".txt"));
+
+        // Reads all of the lines of the file
 
         while (reader.hasNextLine()) {
             String[] line = reader.nextLine().split(",");
@@ -337,7 +387,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
     @Override
     public void modifyState() {
-        // Reserved method for eigenfaces
+        // Reserved method for eigenfaces in future versions
     }
 
     /**
@@ -350,7 +400,11 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         // This is used to change the image to make it look like a video based on triggers from the timer
         if (e.getSource() == timer) {
 
+            // Gets new image from webcam
+
             image = webcam.getImage();
+
+            //Sets the image to invisible
 
             imageLbl.setVisible(false);
 
@@ -365,6 +419,8 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
                 }
             }
 
+            //
+
             image = ImageAnalysis.cropImage(image, (image.getWidth() - image.getHeight()) / 2, 0, image.getHeight(), image.getHeight());
             image = ImageAnalysis.resize(image, imageHeight, imageWidth);
 
@@ -375,6 +431,7 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
 
         }
 
+        // This enables the storage of data by calling the method saveNewState() when register is clicked
 
         if (e.getSource() == register) {
 
@@ -385,6 +442,8 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
             }
 
         }
+
+        // Disposes of the screen, returning to the old screen
 
         if (e.getSource() == save) {
             Main.newface.dispose();
@@ -408,11 +467,16 @@ public class NewFace extends JFrame implements AdditionServices, ActionListener,
         timer.setDelay(timerTime);
     }
 
+    /**
+     * Slider code (removed in current version for this screen)
+     * @param e
+     */
     @Override
     public void stateChanged(ChangeEvent e) {
         if (e.getSource() == slider) {
             delay = slider.getValue();
 
+            // Restarts the timer with the new delay
             timer.stop();
             timer = new Timer(delay, this);
             timer.start();

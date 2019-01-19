@@ -37,6 +37,8 @@ public class Classify {
 
     public String imageName;
 
+    boolean isFace = true;
+
     public Classify(BufferedImage img) throws IOException {
 
         setImage(img);
@@ -214,10 +216,12 @@ public class Classify {
 
         if (zoneIntensities[0] == 100000 && zoneIntensities[1] == 100000) {
             System.out.println("not a face");
+            isFace = false;
         }
 
     }
 
+    // Redundant function, but kept for future references
     public void assignEyesHaar() throws IOException {
 
         eyeLength = headLength / 3;

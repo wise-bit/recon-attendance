@@ -14,7 +14,12 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Scanner;
 import java.util.concurrent.Flow;
 
 public class TrainFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
@@ -77,7 +82,9 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
         askName.setBounds(0, 70, getWidth(), 20);
         add(askName);
 
-        nameChoser = new JComboBox(Main.listFilesFolders("res/trainingSet/" + Main.currentTeacher));
+        nameChoser = new JComboBox(comboboxDataSet());
+        nameChoser.addItem("Select");
+        nameChoser.setSelectedItem("Select");
         nameChoser.setVisible(true);
         int nameChoserWidth = 200;
         int nameChoserHeight = 30;
@@ -157,8 +164,110 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
     }
 
+    // Creates the data set for JComboBox
+    public String[] comboboxDataSet() {
+        String[] array = Main.listFiles("res/studentFaceData/" + Main.currentTeacher + "/");
+        return array;
+    }
+
     @Override
-    public void saveNewState() {
+    public void saveNewState() throws IOException {
+
+        String filePathForFaceData = "res/studentFaceData/" + Main.currentTeacher + "/" + nameBox + ".txt";
+        String filePathForInformation = "res/studentInformation/" + Main.currentTeacher + ".txt";
+
+        // Creates a file from the filename for data manipulation
+        File faceDir = new File(filePathForFaceData);
+        faceDir.createNewFile();
+
+        // This keeps track of the last line
+
+        Classify c = new Classify(image);
+
+        // Only attempts to add a face if a face is detected
+
+        if (c.isFace) {
+
+            // Keeps track of old data to be read from file
+            int prevHeadtoEye = 0;
+            int prevEyetoMouth = 0;
+            int prevHeadtoMouth = 0;
+            int prevHeadMouthRatio = 0;
+
+            // Creates the variables necessary to get all the details of the face, from the key features
+            int headtoEye = c.eyeY - c.headY;
+            int eyetoMouth = c.mouthY - c.eyeY;
+            int headtoMouth = c.mouthY - c.headY;
+            int headMouthRatio = (int) (Math.abs(c.headX2 - c.headX1) / Math.abs(c.mouthX1 - c.mouthX2));
+
+            String data = "";
+            Scanner readOldFaceData = new Scanner(new File(filePathForFaceData));
+
+            if (Main.countLines(filePathForFaceData) > 0) {
+
+                // Averaging with old data, with old data prioritized slightly more in order to prevent drastic changes to data
+
+                String[] line = readOldFaceData.nextLine().split(",");
+
+                // Stores all of the old parameters by parsing them to integers
+
+                prevHeadtoEye = Integer.parseInt(line[0]);
+                prevEyetoMouth = Integer.parseInt(line[1]);
+                prevHeadtoMouth = Integer.parseInt(line[2]);
+                prevHeadMouthRatio = Integer.parseInt(line[0]);
+
+                // A ratio which reasonably doesn't change too much
+
+                // This is the ratio of how much is allowed to be changed at once of the parameters (20%)
+
+                double changeRatio = 0.2;
+
+                // Modifying each of the past results to the updated ones
+
+                headtoEye = (int) (headtoEye * changeRatio + prevHeadtoEye * (1 - changeRatio));
+                eyetoMouth = (int) (eyetoMouth * changeRatio + prevEyetoMouth * (1 - changeRatio));
+                headtoMouth = (int) (headtoMouth * changeRatio + prevHeadtoMouth * (1 - changeRatio));
+                headMouthRatio = (int) (headMouthRatio * changeRatio + prevHeadMouthRatio * (1 - changeRatio));
+
+            }
+
+            // Formats the string in a way so that it can be read later in the future
+
+            data = String.format("%d,%d,%d,%d", headtoEye, eyetoMouth, headtoMouth, headMouthRatio);
+
+            // Stores the formatted string as a byte stream
+
+            byte[] bytes = data.getBytes();
+            FileOutputStream stream = new FileOutputStream(filePathForFaceData, false);
+            stream.write(bytes);
+            stream.close();
+
+
+            // This prevents the user from editing this data on this form anymore, therefore only adding images for one user at a time
+            nameField.setEditable(false);
+            studentIDField.setEditable(false);
+
+            // Add new information about the student to the studentInformation file
+
+            // This string is formatted to store all information in a separated way, for the details
+            String formatted = String.format("\n%s,%s", nameField.getText(), studentIDField.getText());
+
+            // Stores the student information for future references
+
+            try {
+                Files.write(Paths.get(filePathForInformation), formatted.getBytes(), StandardOpenOption.APPEND);
+            }catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+
+
+        } else {
+
+            // In case no face is detected, show this
+
+            JOptionPane.showMessageDialog(null, "No face detected, please try again...",
+                    "Info", JOptionPane.INFORMATION_MESSAGE);
+        }
 
     }
 
@@ -200,14 +309,7 @@ public class TrainFace extends JFrame implements AdditionServices, ActionListene
 
         if (e.getSource() == register) {
 
-            String filePath = "res/trainingSet/" + Main.currentTeacher + "/" + nameChoser.getSelectedItem().toString() + "/";
-            File dir = new File(filePath);
-            dir.mkdir();
-            try {
-                ImageIO.write(ImageAnalysis.trainingReady(image), "PNG", new File(filePath + "image" + (Main.countFolders(filePath)+1) + ".png"));
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
+            saveNewState();
 
         }
 

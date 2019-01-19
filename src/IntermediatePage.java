@@ -202,7 +202,26 @@ public class IntermediatePage extends JFrame implements ActionListener {
             String current = classChooser.getSelectedItem().toString();
             Main.currentClass = current;
 
-        }
+        } else
+
+        if (e.getSource() == addClass) {
+            try {
+                Main.addClass = new AddClass();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        } else
+
+        if (e.getSource() == logout) {
+
+            Main.intermediatePage.dispose();
+            try {
+                Main.login = new Login();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+        } else
 
         if (Main.currentClass.equals("Select")) {
             JOptionPane.showMessageDialog(this, "Please choose a class!",
@@ -245,25 +264,6 @@ public class IntermediatePage extends JFrame implements ActionListener {
 
                 Main.history = new AttendanceHistory();
 
-            }
-
-        }
-
-        if (e.getSource() == addClass) {
-            try {
-                Main.addClass = new AddClass();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        if (e.getSource() == logout) {
-
-            Main.intermediatePage.dispose();
-            try {
-                Main.login = new Login();
-            } catch (IOException e1) {
-                e1.printStackTrace();
             }
 
         }

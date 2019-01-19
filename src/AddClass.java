@@ -29,7 +29,7 @@ public class AddClass extends JFrame implements ActionListener {
         title.setForeground(Color.YELLOW);
         add(title);
 
-        JLabel askClassName = new JLabel("Class name: ");
+        JLabel askClassName = new JLabel("Class name: ", SwingConstants.CENTER);
         askClassName.setBounds(100, 100, 150, 20);
         askClassName.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 18));
         askClassName.setVisible(true);
