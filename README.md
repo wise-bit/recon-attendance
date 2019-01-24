@@ -19,18 +19,31 @@ In a nutshell, reconattendance's components include:
 (i) The program has an extremely unique method of recognition of facial recognition by primary treatment of images
 to enhance certain features. Therefore, this approach not only makes the existing features work better, but also allows
 future additions of more features of a face without too much effort. This makes the program very versatile.
+
 (ii) All major features protected under a self-defined encryption system with a secure password to ensure students
 cannot change any major aspects of the program without teachers' supervision
+
 (iii) Adding of further versions of a face over time to improve results.
+
 (iv) A generally fully functional attendance app with or without the camera support, to a certain extent
+
 (v) A new and innovative way of processing images and using them for training models and tweaking parameters
+
+
+### Process Of Training:
+
+![Image of flow of process Of training](/res/process-of-training.jpg)
 
 ## Major Skills
 
 (i) Object oriented programming - Teachers, Students, Classes, Faces
+
 (2) Image Processing - The whole project is based on image manipulation
+
 (3) Object comparisons
+
 (4) Mathematical innovation
+
 (5) Significant planning skills for development of new algorithms
 
 ## Area of concern:
