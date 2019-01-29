@@ -1,8 +1,6 @@
 # Reconattendance
 
-## Title
-
-Reconattendance (A combination of reconnaissance and attendance)
+Reconattendance - A combination of reconnaissance and attendance
 
 ## Description
 
