@@ -26,8 +26,8 @@ import java.util.concurrent.Flow;
 public class TrainFace extends JFrame implements AdditionServices, ActionListener, WebcamClass, ChangeListener {
 
     // initial ratio is 450 by 350
-    public static final int imageWidth = 450;
-    public static final int imageHeight = 350;
+    public static final int imageWidth = 400;
+    public static final int imageHeight = 400;
 
     JLabel title;
 

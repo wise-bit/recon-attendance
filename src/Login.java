@@ -100,7 +100,7 @@ public class Login extends JFrame implements ActionListener {
         login.setBackground(new Color(154, 224, 247));
         login.setForeground(Color.WHITE);
         //login.setFocusPainted(false);
-        login.setFont(new Font("Tahoma", Font.BOLD, 14));
+        login.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 14));
         login.addActionListener(this);
         add(login);
         
@@ -108,7 +108,7 @@ public class Login extends JFrame implements ActionListener {
         signup.setBackground(new Color(154, 224, 247));
         signup.setForeground(Color.WHITE);
         //signup.setFocusPainted(false);
-        signup.setFont(new Font("Tahoma", Font.BOLD, 14));
+        signup.setFont(new Font("Source Code Pro Semibold", Font.BOLD, 14));
         signup.addActionListener(this);
         add(signup);
 

@@ -256,6 +256,9 @@ public class FaceScanPage extends JFrame implements ActionListener {
                         String pathToAttendanceFile = "res/attendanceData/" + Main.currentTeacher + "/" + Main.currentClass + "/" + date + ".txt";
                         File attendanceFile = new File(pathToAttendanceFile);
 
+                        // Create file if file does not exist
+                        attendanceFile.createNewFile();
+
                         // Checks if the person was already admitted to the class for that day or not
                         if (!alreadyAdmitted(identity.substring(0, identity.length() - 4), pathToAttendanceFile)) {
 

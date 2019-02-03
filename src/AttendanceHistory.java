@@ -59,7 +59,11 @@ public class AttendanceHistory extends JFrame implements ActionListener {
         // Makes a combobox using the exerciseList, which has an actionListener
         // Instead of depending on yet another button
         classroomSelection = new JComboBox(classesList);
-        classroomSelection.setSelectedItem(classesList.length-1);
+
+        classroomSelection.addItem("-- Select --");
+        classroomSelection.setSelectedItem("-- Select --");
+
+        // classroomSelection.setSelectedItem(classesList.length-1);
         System.out.println(classroomSelection.getSelectedItem());
         classroomSelection.addActionListener(this);
 
